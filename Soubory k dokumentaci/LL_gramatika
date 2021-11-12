@@ -14,13 +14,13 @@ PARAM_NEXT              ->          ε
 CALL_FUNCTION           ->          FUNCTION_ID (ENTRY_LIST_PARAMS)
 ENTRY_LIST_PARAMS       ->          ENTRY_PARAM ENTRY_PARAM_NEXT
 ENTRY_LIST_PARAMS       ->          ε
-ENTRY_PARAM             ->          EXPRESSION
+ENTRY_PARAM             ->          expression
 ENTRY_PARAM             ->          VALUE_ID
-ENTRY_PARAM_NEXT        ->          ,ENTRY_PARAM ENTRY_PARAM_NEXT
+ENTRY_PARAM_NEXT        ->          , ENTRY_PARAM ENTRY_PARAM_NEXT
 ENTRY_PARAM_NEXT        ->          ε
 DECLARE_FUNCTION        ->          global FUNCTION_ID : function ( LIST_OF_TYPES ) RETURN_LIST_OF_TYPES
 LIST_OF_TYPES           ->          ε
-LIST_OF_TYPES	        ->          TYPE TYPE_NEXT
+LIST_OF_TYPES           ->          TYPE TYPE_NEXT
 RETURN_LIST_OF_TYPES    ->          ε
 RETURN_LIST_OF_TYPES    ->          : TYPE TYPE_NEXT
 TYPE                    ->          TYPE_VALUE
@@ -33,25 +33,25 @@ STATEMENT               ->          STATE_IF STATEMENT
 STATEMENT               ->          STATE_RETURN
 STATEMENT               ->          STATE_WHILE STATEMENT
 STATEMENT               ->          ε
-STATE_WHILE             ->          while EXPRESSION do STATEMENT end STATEMENT
+STATE_WHILE             ->          while expression do STATEMENT end STATEMENT
 STATE_RETURN            ->          LIST_OF_RETURN_VALUES
 LIST_OF_RETURN_VALUES   ->          RETURN_VALUE RETURN_VALUE_NEXT
 LIST_OF_RETURN_VALUES   ->          ε
 RETURN_VALUE            ->          VALUE_ID
 RETURN_VALUE_NEXT       ->          , RETURN_VALUE RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT       ->          ε
-STATE_IF                ->          if EXPRESSION then STATEMENT STATE_ELSE end
+STATE_IF                ->          if expression then STATEMENT STATE_ELSE end
 STATE_ELSE              ->          else STATEMENT
 STATE_ELSE              ->          ε
 VALUE                   ->          VALUE_ID VALUE_ID_NEXT = INIT_VALUE INIT_VALUE_NEXT
-INIT_VALUE              ->          EXPRESSION
+INIT_VALUE              ->          expression
 INIT_VALUE              ->          CALL_FUNCTION
 INIT_VALUE_NEXT         ->          ε
 INIT_VALUE_NEXT         ->          , INIT_VALUE INIT_VALUE_NEXT
 LOCAL VALUE             ->          local VALUE_ID : TYPE_VALUE  INIT_VALUE
 INIT_LOCAL_VALUE        ->          ε
 INIT_LOCAL_VALUE        ->          = INIT_VALUE
-VALUE_ID                ->          ID
+VALUE_ID                ->          id
 VALUE_ID_NEXT           ->          ε
 VALUE_ID_NEXT           ->          , VALUE_ID VALUE_ID_NEXT
 TYPE_VALUE              ->          string
