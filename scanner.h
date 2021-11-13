@@ -193,3 +193,11 @@ void print_token_list(token_ptr first);
  * @param token Token to be printed.
  */
 void print_single_token(token_ptr token);
+
+/**
+ * @brief Finiste state machine which decides the type of token.
+ * 
+ * @param token Token pointer whomst type we need to determine.
+ * @return int State code, If there aren't any errors ? 0 : 2 
+ */
+int lex_fsm(token_ptr *token);
