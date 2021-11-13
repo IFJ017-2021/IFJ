@@ -90,7 +90,7 @@ typedef enum {
     S_COMMENT0,
     S_COMMENT1,
     S_COMMENT2,
-    S_COMMENT4,
+    S_COMMENT3,
     S_ADD,
     S_MUL,
     S_DIV,
@@ -107,8 +107,8 @@ typedef enum {
 	S_LTE,          // <=
     S_COMMA,
 	S_ID,
+    S_INT,
 	S_INT0,
-	S_INT,
     S_HEX0,
 	S_HEX1,
 	S_FP_DOT,
@@ -167,7 +167,7 @@ int get_token_list(token_ptr *first);
  * @brief Read single token from stdin and insert into passed token pointer.
  * 
  * @param insert_into Token pointer into which are data supposed to be insterted. 
- * @return int State code, If there arenn't any errors ? 0 : 2
+ * @return int State code, If there aren't any errors ? 0 : 2
  */
 int get_single_token(token_ptr *insert_into);
 
