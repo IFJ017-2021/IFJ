@@ -22,7 +22,7 @@ typedef enum {
     T_EOF,
 	T_SUB,
 	T_ADD,
-	T_MULL,
+	T_MUL,
 	T_DIV,
     T_IDIV,
 	T_STRLEN,
@@ -131,7 +131,9 @@ typedef enum {
     S_STR_T6,       // \2                T13
     S_STR_T7,       // \2(0-4)           T14
     S_STR_T8,       // \25               T15
-    S_STR_FIN       // "
+    S_STR_FIN,       // "
+    S_NULL,
+    S_ERR
 } lexfsm_state;
 
 /**
@@ -141,7 +143,7 @@ typedef union {
     char *string; // change to our type string as in showcase
     int integer;
     double number;
-} token_data; 
+} *token_data; 
 
 /**
  * @brief Token pointer struct. 
