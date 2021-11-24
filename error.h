@@ -21,3 +21,5 @@
 #define ERR_INTERNAL        99
 
 #endif
+
+void err_call(int error);

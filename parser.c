@@ -14,4 +14,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void mainList()
+token_ptr token;
+
+void start()
+{
+    if(get_token_list(&token) == ERR_LEX)
+    {
+        err_call(ERR_LEX);
+    }
+    token = token->next;
+
+}
