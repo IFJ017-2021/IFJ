@@ -4,6 +4,7 @@
  *  @brief Implemantation doubly linked list.
  *
  *  @author <xpoliv06> Tomáš Polívka
+ *  @author <xhajek51> Vojtěch Hájek
  */
 
 #include "tokenList.h"
@@ -181,7 +182,6 @@ void DLL_InsertBefore(DLList *list, token_ptr token){
     }
 
     token_ptr newElemPtr = (token_ptr) malloc(sizeof(struct token));
-    // Pokud nastane chyba pri alokaci
     if(newElemPtr == NULL)
     {
         err_call(ERR_INTERNAL);

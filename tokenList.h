@@ -4,6 +4,7 @@
  *  @brief Header file for tokenList.c (Doubly linked list of tokens).
  *
  *  @author <xpoliv06> Tomáš Polívka
+ *  @author <xhajek51> Vojtěch Hájek
  */
 
 #include <stdio.h>
