@@ -17,9 +17,9 @@
  * @brief Doubly linked list of tokens
  */
 typedef struct {
-    token_ptr first;
-    token_ptr active;
-    token_ptr last;
+    struct token *first;
+    struct token *active;
+    struct token *last;
 } DLList;
 
 /**
