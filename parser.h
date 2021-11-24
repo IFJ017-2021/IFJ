@@ -18,10 +18,9 @@ static int start()
 /**
  * @brief Implementation of MAIN_LIST rule. <br>
  *  1) function ID (LIST_OF_PARAMS) RETURN_LIST_OF_PARAMS STATEMENT end <br>
- *  2) global ID : function (LIST_OF_TYPES) RETURN_LIST_OF_TYPES <br>
+ *  2) global : function (LIST_OF_TYPES) RETURN_LIST_OF_TYPES <br>
  *  3) ID (ENTRY_LIST_PARAMS)
  * @param ... ?
- * @return exit code
  */
 static int mainList()
 
