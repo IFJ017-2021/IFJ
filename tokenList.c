@@ -8,7 +8,6 @@
  */
 
 #include "tokenList.h"
-#include "scanner.h"
 #include "error.h"
 
 void DLL_Init(DLList *list)
@@ -191,7 +190,7 @@ void DLL_DeleteBefore(DLList *list)
     {
         token->prev->next = list->active;
     }
-    free(token)
+    free(token);
 
 } /*DLL_DeleteBefore*/
 
@@ -246,7 +245,7 @@ void DLL_InsertBefore(DLList *list, token_ptr token)
 void DLL_GetValue(DLList *list, token_ptr *token){
     if(list->active != NULL)
     {
-        *token = list->active->data;
+        *token = list->active;
     }
     else
     {

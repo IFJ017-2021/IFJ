@@ -9,7 +9,6 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
-#include "tokenList.h"
 
 #define str(x) #x
 #define xstr(x) str(x)
