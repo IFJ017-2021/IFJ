@@ -40,14 +40,51 @@ void DLL_DeleteBefore(DLList *list);
 void DLL_InsertAfter(DLList *list, token_ptr token);
 
 void DLL_InsertBefore(DLList *list, token_ptr token);
+{
+    if(list->active == NULL)
+    {
+        return;
+    }
 
-void DLL_GetValue(DLList *list, token_ptr *token);
+    token_ptr newElemPtr = (token_ptr) malloc(sizeof(struct token));
+    // Pokud nastane chyba pri alokaci
+    if(newElemPtr == NULL)
+    {
+        err_call(ERR_INTERNAL);
+    }
+
+    newElemPtr = token;
+    newElemPtr->next = list->active;
+    newElemPtr->prev = list->active->prev;
+    list->active->prev = newElemPtr;
+
+    if (list->active == list->first)
+    {
+        list->first = newElemPtr;
+    }
+    else
+    {
+        newElemPtr->prev->next = newElemPtr;
+    }
+} /*DLL_InsertBefore*/
+
+void DLL_GetValue(DLList *list, token_ptr *token)
+{
+    if(DLL_IsActive(list))
+    {
+        *dataPtr = list->activeElement->data;
+    }
+    else
+    {
+        err_call(ERR_INTERNAL);
+    }
+} /*DLL_GetValue*/
 
 void DLL_SetValue(DLList *list, token_ptr token)
 {
     if(list->active != NULL)
     {
-        list->active->data = data;
+        list->active = token;
     }
 } /*DLL_SetValue*/
 
