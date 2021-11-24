@@ -12,7 +12,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-void err_call(int error, token_ptr *list) {
+void err_call(int error) {
     switch (error) {
         case ERR_LEX:
             fprintf(stderr, "ERR 1 - Lexical error\n");
