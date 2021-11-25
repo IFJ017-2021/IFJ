@@ -7,7 +7,6 @@
  */
 #include "error.h"
 #include "str.h"
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
