@@ -16,6 +16,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#define GET_TOKEN()                                 \
+    DLL_Next(token_list);                           \
+    DLL_GetValue(token_list, &token);               \
+    if(token->type == T_EOL)                        \
+    {                                               \
+      GET_TOKEN();                                  \
+    }
+
+#define CHECK_TYPE(_type)                           \
+	if (token->type != (_type)) err_call(ERR_SYNTAX)
+
 DLList token_list;
 token_ptr token;
 
@@ -26,13 +37,9 @@ void start()
     {
         err_call(ERR_LEX);
     }
-    DLL_Next(token_list);
-    DLL_GetValue(token_list, &token);
-    if(token->type != T_K_REQUIRE){
-        err_call(ERR_SYNTAX);
-    }
-    token = token->next;
-    DLL_InsertLast(&token_list, token);
+    GET_TOKEN();
+    CHECK_TYPE(T_K_REQUIRE);
+
     if(token->type != T_STRING || strcmp(token->data->string, "ifj21") != 0){
         err_call(ERR_SYNTAX);
     }
@@ -40,9 +47,8 @@ void start()
 
     token = token->next;
     DLL_InsertLast(&token_list, token);
-    if(token->type != T_EOF){
-        err_call(ERR_SYNTAX);
-    }
+
+    CHECK_TYPE(T_EOF);
     return;
 }
 void main_list(){
