@@ -95,7 +95,31 @@ void main_list(){
             GET_TOKEN()
             main_next();
             break;
-        case T_K_GLOBAL:;break;
+        case T_K_GLOBAL:
+            GET_TOKEN()
+            CHECK_TYPE(T_K_GLOBAL);
+
+            GET_TOKEN()
+            CHECK_TYPE(T_ID);
+
+            GET_TOKEN()
+            CHECK_TYPE(T_DOUBLE_DOT);
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_FUNCTION);
+
+            GET_TOKEN()
+            CHECK_TYPE(T_LEFT_PAR);
+
+            GET_TOKEN()
+            list_of_types();
+
+            GET_TOKEN()
+            return_list_of_types();
+
+            GET_TOKEN()
+            main_next();
+            break;
         default:
             err_call(ERR_SYNTAX);
             break;
@@ -104,57 +128,273 @@ void main_list(){
 void main_next(){
     if(token->type == T_ID || token->type == T_K_FUNCTION || token->type == T_K_GLOBAL){
         main_list();
+    } else{
+        DLL_Previous(&token_list);
     }
 }
 
 void statement(){
+    switch (&token->type) {
+        case T_ID:
+            GET_TOKEN()
+            if(token->type == T_LEFT_PAR){
+                entry_list_params()
 
+                GET_TOKEN()
+                CHECK_TYPE(T_RIGHT_PAR);
+
+                GET_TOKEN()
+                statement();
+            } else{
+                value_id_next();
+
+                GET_TOKEN()
+                CHECK_TYPE(T_EQL);
+
+                GET_TOKEN()
+                init_value();
+
+                GET_TOKEN()
+                init_value_next();
+
+                GET_TOKEN()
+                statement();
+            }
+            break;
+        case T_K_LOCAL:
+            GET_TOKEN()
+            CHECK_TYPE(T_ID);
+
+            GET_TOKEN()
+            CHECK_TYPE(T_DOUBLE_DOT);
+
+            GET_TOKEN()
+            type_value();
+
+            GET_TOKEN()
+            init_value();
+
+            GET_TOKEN()
+            statement();
+            break;
+        case T_K_IF:
+            GET_TOKEN()
+            // expression
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_THEN);
+
+            GET_TOKEN()
+            statement();
+
+            GET_TOKEN();
+            state_else();
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_END);
+
+            GET_TOKEN()
+            statement();
+            break;
+        case T_K_RETURN:
+            GET_TOKEN()
+            return_list();
+
+            GET_TOKEN()
+            statement();
+            break;
+        case T_K_WHILE:
+            GET_TOKEN()
+            // expression
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_DO);
+
+            GET_TOKEN()
+            statement();
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_END);
+
+            GET_TOKEN()
+            statement();
+            break;
+        default:
+            DLL_Previous(&token_list);
+            break;
+    }
 }
 void list_of_params(){
+    if(token->type == T_ID){
+        GET_TOKEN()
+        CHECK_TYPE(T_DOUBLE_DOT);
 
+        GET_TOKEN()
+        type_value();
+
+        GET_TOKEN()
+        param_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void param_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        CHECK_TYPE(T_ID);
 
+        GET_TOKEN()
+        CHECK_TYPE(T_DOUBLE_DOT);
+
+        GET_TOKEN()
+        type_value();
+
+        GET_TOKEN()
+        param_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void entry_list_params(){
+    if(/*token-type == expression || */ token->type == T_ID){
+        entry_param();
 
+        GET_TOKEN()
+        entry_param_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void entry_param(){
-
+    if(/*token-type != expression && */ token->type != T_ID){
+        err_call(ERR_SYNTAX);
+    }
 }
 void entry_param_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        entry_param();
 
+        GET_TOKEN()
+        entry_param_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void list_of_types(){
+    if((token->type == TOKEN_TYPE_DOUBLE_NUMBER)
+	|| (token->type == TOKEN_TYPE_INT_NUMBER)
+	|| (token->type == TOKEN_TYPE_STRING)
+	|| (token->type == TOKEN_TYPE_IDENTIFIER)){
+        type_value();
 
+        GET_TOKEN()
+        type_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void return_list_of_types(){
+    if(token->type == T_DOUBLE_DOT){
+        GET_TOKEN()
+        type_value();
 
+        GET_TOKEN()
+        type_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void type_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        type_value();
 
+        GET_TOKEN()
+        type_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void type_value(){
-
+    IS_TYPE_VALUE(token);
 }
 void return_list(){
+    if(token->type == T_ID){
+        GET_TOKEN()
+        if(token->type == T_LEFT_PAR){
+            GET_TOKEN()
+            entry_list_params();
 
+            GET_TOKEN()
+            CHECK_TYPE(T_RIGHT_PAR);
+        } else{
+            return_value_next();
+        }
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void return_value_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        CHECK_TYPE(T_ID);
 
+        GET_TOKEN()
+        return_value_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void state_else(){
-
+    if(token->type == T_K_ELSE){
+        GET_TOKEN()
+        statement();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void init_value(){
+    if(/*token->type == expression || */token->type == T_ID) {
+        GET_TOKEN()
+        CHECK_TYPE(T_LEFT_PAR);
 
+        GET_TOKEN()
+        entry_list_params();
+
+        GET_TOKEN()
+        CHECK_TYPE(T_RIGHT_PAR);
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void init_value_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        init_value();
 
+        GET_TOKEN()
+        init_value_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
 void init_local_value(){
-
+    if(token->type == T_EOL){
+        GET_TOKEN()
+        init_value();
+    } else {
+        DLL_Previous(&token_list);
+    }
 }
 void value_id_next(){
+    if(token->type == T_COMMA){
+        GET_TOKEN()
+        CHECK_TYPE(T_ID);
 
+        GET_TOKEN()
+        value_id_next();
+    } else{
+        DLL_Previous(&token_list);
+    }
 }
