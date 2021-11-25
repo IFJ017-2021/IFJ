@@ -45,55 +45,62 @@ void start()
     }
     main_list();
 
-    token = token->next;
-    DLL_InsertLast(&token_list, token);
-
+    GET_TOKEN()
     CHECK_TYPE(T_EOF);
     return;
 }
 void main_list(){
     switch (&token->type) {
         case T_K_FUNCTION:
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
-            if(token->type != T_ID){
-                err_call(ERR_SYNTAX);
-            }
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
-            if(token->type != T_LEFT_PAR){
-                err_call(ERR_SYNTAX);
-            }
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
+            GET_TOKEN()
+            CHECK_TYPE(T_ID);
 
+            GET_TOKEN()
+            CHECK_TYPE(T_LEFT_PAR);
+
+            GET_TOKEN()
             list_of_params();
 
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
-            if(token->type != T_RIGHT_PAR){
-                err_call(ERR_SYNTAX);
-            }
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
+            GET_TOKEN()
+            CHECK_TYPE(T_RIGHT_PAR);
+
+            GET_TOKEN()
             return_list_of_types();
 
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
+            GET_TOKEN()
             statement();
 
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
-            if(token->type != T_K_END){
-                err_call(ERR_SYNTAX);
-            }
-            token = token->next;
-            DLL_InsertLast(&token_list, token);
-            main_list();break;
-        case T_ID: ;break;
+            GET_TOKEN()
+            CHECK_TYPE(T_K_END);
+
+            GET_TOKEN()
+            main_next();
+            break;
+        case T_ID:
+            GET_TOKEN()
+            CHECK_TYPE(T_LEFT_PAR);
+
+            GET_TOKEN()
+            entry_list_params();
+
+            GET_TOKEN()
+            CHECK_TYPE(T_RIGHT_PAR);
+
+            GET_TOKEN()
+            main_next();
+            break;
         case T_K_GLOBAL:;break;
+        default:
+            err_call(ERR_SYNTAX);
+            break;
     }
 }
+void main_next(){
+    if(token->type == T_ID || token->type == T_K_FUNCTION || token->type == T_K_GLOBAL){
+        main_list();
+    }
+}
+
 void statement(){
 
 }
