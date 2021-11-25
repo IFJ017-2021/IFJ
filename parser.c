@@ -282,10 +282,10 @@ void entry_param_next(){
     }
 }
 void list_of_types(){
-    if((token->type == TOKEN_TYPE_DOUBLE_NUMBER)
-	|| (token->type == TOKEN_TYPE_INT_NUMBER)
-	|| (token->type == TOKEN_TYPE_STRING)
-	|| (token->type == TOKEN_TYPE_IDENTIFIER)){
+    if((token->type == T_K_INTEGER)
+	|| (token->type == T_K_STRING)
+	|| (token->type == T_K_NUMBER)
+	|| (token->type == T_K_NIL)){
         type_value();
 
         GET_TOKEN()
