@@ -25,7 +25,7 @@ int strInit(string *s){
         s->length = 0;
         s->capacity = STR_LEN_INC;
         return STR_OK;
-    }else if(s->data == NULL){ // String allocation FAILED
+    }else{ // String allocation FAILED
         return STR_ERR;
     }
 }

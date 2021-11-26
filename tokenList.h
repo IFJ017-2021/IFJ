@@ -10,8 +10,6 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include "scanner.h"
-#include "error.h"
-
 
 /**
  * @brief Doubly linked list of tokens

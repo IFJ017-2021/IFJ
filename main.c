@@ -20,15 +20,14 @@ int main(int argc, char *argv[]) {
   FILE *f;
   if (argc == 1) {
     fprintf(stderr, "Missing a file argument.\n");
-    return ERR_INTERNAL;
+    err_call(ERR_INTERNAL);
   }
   if ((f = freopen(argv[1], "r", stdin)) == NULL) {
     fprintf(stderr, "File can't be opened.\n");
-    return ERR_INTERNAL;
+    err_call(ERR_INTERNAL);
   }
 
-  token_ptr *token_list;
-
+  token_ptr *token_list = NULL;
   int lex_return = get_token_list(token_list);
 
   if (lex_return == 0) {

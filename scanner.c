@@ -72,7 +72,7 @@ int lex_fsm(token_ptr *token) {
 
   static uint8_t escape_code = 0;
 
-  string *read_input;
+  string *read_input = NULL;
   strInit(read_input);
 
   (*token)->type = T_OTHER;
@@ -81,7 +81,7 @@ int lex_fsm(token_ptr *token) {
 
   while (fsm_activator) {
     char current = getc(stdin);
-    col_num == 1 ?: col_num++;
+    col_num == 1 ? true : col_num++;
     strAppendChar(read_input, current);
     nstate = S_NULL;
 
@@ -127,6 +127,7 @@ int lex_fsm(token_ptr *token) {
         nstate = S_EOF;
       else if (isspace(current))
         nstate = S_SPACE;
+      break;
 
     case S_SPACE:
       if (current != '\n' && isspace(current))

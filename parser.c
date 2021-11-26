@@ -8,7 +8,6 @@
  */
 
 #include "parser.h"
-#include "scanner.h"
 #include "error.h"
 #include "str.h"
 #include "tokenList.h"
@@ -16,22 +15,21 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#define GET_TOKEN()                                 \
-    DLL_Next(token_list);                           \
-    DLL_GetValue(token_list, &token);               \
-    if(token->type == T_EOL)                        \
-    {                                               \
-      GET_TOKEN();                                  \
+#define GET_TOKEN()                                   \
+    while(token->type == T_EOL)                       \
+    {                                                 \
+      DLL_Next(&token_list);                          \
+      DLL_GetValue(&token_list, &token);              \
     }
 
 #define CHECK_TYPE(_type)                           \
 	if (token->type != (_type)) err_call(ERR_SYNTAX)
 
-#define IS_TYPE_VALUE(token)										\
-	if((token->type != TOKEN_TYPE_DOUBLE_NUMBER)					\
-	&& (token->type != TOKEN_TYPE_INT_NUMBER)						\
-	&& (token->type != TOKEN_TYPE_STRING)							\
-	&& (token->type != TOKEN_TYPE_IDENTIFIER)) err_call(ERR_SYNTAX)
+#define IS_TYPE_VALUE(_token)										\
+	if((_token->type != T_DOUBLE)					\
+	&& (_token->type != T_INT)						\
+	&& (_token->type != T_STRING)							\
+	&& (_token->type != T_ID)) err_call(ERR_SYNTAX)
 
 #define  IS_EXPRESSION(token) \
     if((token->type == T_ID)          \
@@ -40,14 +38,14 @@
     && (token->next->type != T_GT)      \
     && (token->next->type != T_GTE)     \
     && (token->next->type != T_LT)      \
-    && (token->next->tpye != T_LTE)     \
+    && (token->next->type != T_LTE)     \
     && (token->next->type != T_NEQL)    \
     && (token->next->type != T_MUL)     \
     && (token->next->type != T_SUB)     \
     && (token->next->type != T_ADD)     \
     && (token->next->type != T_DIV)     \
     && (token->next->type != T_IDIV)    \
-    && (token->next->tpye != T_STRLEN)  \
+    && (token->next->type != T_STRLEN)  \
     ){}else {/*expression(); */}
 
 DLList token_list;
@@ -55,12 +53,12 @@ token_ptr token;
 
 void start()
 {
-    DLL_Init(&token_list)
+    DLL_Init(&token_list);
     if(get_token_list(&token) == ERR_LEX)
     {
         err_call(ERR_LEX);
     }
-    GET_TOKEN();
+    GET_TOKEN()
     CHECK_TYPE(T_K_REQUIRE);
 
     if(token->type != T_STRING || strcmp(token->data->string, "ifj21") != 0){
@@ -73,7 +71,7 @@ void start()
     return;
 }
 void main_list(){
-    switch (&token->type) {
+    switch (token->type) {
         case T_K_FUNCTION:
             GET_TOKEN()
             CHECK_TYPE(T_ID);
@@ -151,11 +149,11 @@ void main_next(){
 }
 
 void statement(){
-    switch (&token->type) {
+    switch (token->type) {
         case T_ID:
             GET_TOKEN()
             if(token->type == T_LEFT_PAR){
-                entry_list_params()
+                entry_list_params();
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
@@ -286,7 +284,7 @@ void entry_list_params(){
     }
 }
 void entry_param(){
-    IS_EXPRESSION()
+    IS_EXPRESSION(token)
 }
 void entry_param_next(){
     if(token->type == T_COMMA){
