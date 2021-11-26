@@ -48,7 +48,7 @@
     && (token->next->type != T_DIV)     \
     && (token->next->type != T_IDIV)    \
     && (token->next->tpye != T_STRLEN)  \
-    )else /*expression(); */
+    ){}else {/*expression(); */}
 
 DLList token_list;
 token_ptr token;
@@ -286,15 +286,7 @@ void entry_list_params(){
     }
 }
 void entry_param(){
-    if(/*expression*/(token->type != T_ID)
-    && (token->type != T_INT)
-    && (token->type != T_DOUBLE)
-    && (token->type != T_STRING)){
-        err_call(ERR_SYNTAX);
-    } else{
-        IS_EXPRESSION()
-    }
-
+    IS_EXPRESSION()
 }
 void entry_param_next(){
     if(token->type == T_COMMA){
@@ -381,10 +373,10 @@ void state_else(){
     }
 }
 void init_value(){
-    if(/*expression*/(token->type != T_ID)
-    && (token->type != T_INT)
-    && (token->type != T_DOUBLE)
-    && (token->type != T_STRING)) {
+    if(/*expression*/(token->type == T_ID)
+    || (token->type == T_INT)
+    || (token->type == T_DOUBLE)
+    || (token->type == T_STRING)) {
         GET_TOKEN()
         CHECK_TYPE(T_LEFT_PAR);
 
