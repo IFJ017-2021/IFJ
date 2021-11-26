@@ -273,7 +273,10 @@ void param_next(){
     }
 }
 void entry_list_params(){
-    if(/*expression*/ token->type == T_ID || token->type == T_INT || token->type == T_DOUBLE || token->type == T_STRING){
+    if(/*expression*/ (token->type == T_ID)
+    || (token->type == T_INT)
+    || (token->type == T_DOUBLE)
+    || (token->type == T_STRING)){
         entry_param();
 
         GET_TOKEN()
@@ -283,7 +286,10 @@ void entry_list_params(){
     }
 }
 void entry_param(){
-    if(/*expression*/token->type != T_ID && token->type != T_INT && token->type != T_DOUBLE && token->type != T_STRING){
+    if(/*expression*/(token->type != T_ID)
+    && (token->type != T_INT)
+    && (token->type != T_DOUBLE)
+    && (token->type != T_STRING)){
         err_call(ERR_SYNTAX);
     } else{
         IS_EXPRESSION()
@@ -375,7 +381,10 @@ void state_else(){
     }
 }
 void init_value(){
-    if(/*expression*/token->type != T_ID && token->type != T_INT && token->type != T_DOUBLE && token->type != T_STRING)) {
+    if(/*expression*/(token->type != T_ID)
+    && (token->type != T_INT)
+    && (token->type != T_DOUBLE)
+    && (token->type != T_STRING)) {
         GET_TOKEN()
         CHECK_TYPE(T_LEFT_PAR);
 
