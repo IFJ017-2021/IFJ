@@ -9,55 +9,10 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "tokenList.h"
 
 #define str(x) #x
 #define xstr(x) str(x)
-
-/**
- * @brief Enum of all IFJ21 keywords.
- */
-typedef enum {
-    T_OTHER,
-    T_EOL,
-    T_EOF,
-	T_SUB,
-	T_ADD,
-	T_MUL,
-	T_DIV,
-    T_IDIV,
-	T_STRLEN,
-	T_LEFT_PAR,
-    T_RIGHT_PAR,
-	T_DOUBLE_DOT,
-    T_ASSIGN,       // =
-    T_EQL,          // ==
-	T_GT,           // >
-	T_GTE,          // >=
-	T_LT,           // <
-	T_LTE,          // <=
-    T_NEQL,         // ~=
-    T_COMMA,
-	T_ID,
-	T_INT,
-	T_DOUBLE,
-	T_STRING,
-
-	T_K_DO,
-	T_K_ELSE,
-	T_K_END,
-    T_K_FUNCTION,
-    T_K_GLOBAL,
-	T_K_IF,
-	T_K_INTEGER,
-	T_K_LOCAL,
-	T_K_NIL,
-	T_K_NUMBER,
-	T_K_REQUIRE,
-	T_K_RETURN,
-	T_K_STRING,
-	T_K_THEN,
-	T_K_WHILE,
-} token_type;
 
 /**
  * @brief Enum of all IFJ21 keywords.
@@ -137,33 +92,12 @@ typedef enum {
 } lexfsm_state;
 
 /**
- * @brief Union of different possible term values.  
- */
-typedef union {
-    char *string; // change to our type string as in showcase
-    int integer;
-    double number;
-} *token_data; 
-
-/**
- * @brief Token pointer struct. 
- */
-typedef struct token {
-    token_type type;
-    token_data data;
-    unsigned int line_num;
-    unsigned int col_num;
-    struct token *prev;
-    struct token *next;
-} *token_ptr;
-
-/**
  * @brief Function to read whole input and append all tokens to a token list. 
  * 
  * @param first Pointer to first token in list. Insert new tokens after.
  * @return int State code, If there aren't any errors ? 0 : 2 
  */
-int get_token_list(token_ptr *first);
+int get_token_list(DLList *list);
 
 /**
  * @brief Read single token from stdin and insert into passed token pointer.

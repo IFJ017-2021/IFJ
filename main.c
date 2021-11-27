@@ -12,27 +12,39 @@
 
 #include "error.h"
 #include "scanner.h"
-
+#include "parser.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[]) {
-  FILE *f;
-  if (argc == 1) {
-    fprintf(stderr, "Missing a file argument.\n");
-    err_call(ERR_INTERNAL);
-  }
-  if ((f = freopen(argv[1], "r", stdin)) == NULL) {
-    fprintf(stderr, "File can't be opened.\n");
-    err_call(ERR_INTERNAL);
-  }
+int main() {
+//  FILE *f = stdin;
+//  if (argc == 1) {
+//    fprintf(stderr, "Missing a file argument.\n");
+//    err_call(ERR_INTERNAL);
+//  }
+//  if (freopen(argv[1], "r", f)) {
+//    fprintf(stderr, "File can't be opened.\n");
+//    err_call(ERR_INTERNAL);
+//  }
 
-  token_ptr *token_list = NULL;
-  int lex_return = get_token_list(token_list);
+  DLList token_list;
+  token_ptr tokenPtr = malloc(sizeof (struct token));
+  tokenPtr->type = T_K_REQUIRE;
+  DLL_Init(&token_list);
+  DLL_InsertLast(&token_list, tokenPtr);
 
-  if (lex_return == 0) {
-    print_token_list(*token_list);
-  }
+  // Zavolani syntakticke analyzy
+  start(&token_list);
+
+//  int lex_return = get_token_list(&token_list);
+//  if(lex_return == 1)
+//  {
+//      err_call(ERR_LEX);
+//  }
+
+//  if (lex_return == 0) {
+//    print_token_list(*token_list);
+//  }
 
   return 0;
 }

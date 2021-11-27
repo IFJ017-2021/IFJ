@@ -10,7 +10,7 @@
 #include "parser.h"
 #include "error.h"
 #include "str.h"
-#include "tokenList.h"
+#include "scanner.h"
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -51,13 +51,15 @@
 DLList token_list;
 token_ptr token;
 
-void start()
+void start(DLList testlist)
 {
     DLL_Init(&token_list);
-    if(get_token_list(&token) == ERR_LEX)
-    {
-        err_call(ERR_LEX);
-    }
+    token_list = testlist;
+    DLL_First(&token_list);
+//    if(get_token_list(&token_list) == ERR_LEX)
+//    {
+//        err_call(ERR_LEX);
+//    }
     GET_TOKEN()
     CHECK_TYPE(T_K_REQUIRE);
 

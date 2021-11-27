@@ -7,6 +7,7 @@
  *  @author <xhajek51> Vojtěch Hájek
  */
 
+
 #include "tokenList.h"
 #include "error.h"
 
@@ -263,7 +264,7 @@ void DLL_SetValue(DLList *list, token_ptr token)
 
 void DLL_Next(DLList *list)
 {
-    if(list->active != NULL)
+    if(list->active != NULL || list->active->next != NULL)
     {
         list->active = list->active->next;
     }
