@@ -32,7 +32,32 @@ int main() {
   tokenPtr->type = T_K_REQUIRE;
   DLL_Init(&token_list);
   DLL_InsertLast(&token_list, tokenPtr);
-
+  token_ptr tokenPtr0 = malloc(sizeof (struct token));
+  tokenPtr0->type = T_K_STRING;
+  //tokenPtr->data->string = "ifj21";
+  DLL_Init(&token_list);
+  DLL_InsertLast(&token_list, tokenPtr0);
+  token_ptr tokenPtr1 = malloc(sizeof (struct token));
+  tokenPtr1->type = T_K_GLOBAL;
+  DLL_Init(&token_list);
+  DLL_InsertLast(&token_list, tokenPtr1);
+  token_ptr tokenPtr2 = malloc(sizeof (struct token));
+  tokenPtr2->type = T_ID;
+  DLL_Init(&token_list);
+  DLL_InsertLast(&token_list, tokenPtr2);
+  token_ptr tokenPtr3 = malloc(sizeof (struct token));
+  tokenPtr3->type = T_DOUBLE_DOT;
+  DLL_Init(&token_list);
+  DLL_InsertLast(&token_list, tokenPtr3);
+//  tokenPtr->type = T_K_FUNCTION;
+//  DLL_Init(&token_list);
+//  DLL_InsertLast(&token_list, tokenPtr);
+//  tokenPtr->type = T_LEFT_PAR;
+//  DLL_Init(&token_list);
+//  DLL_InsertLast(&token_list, tokenPtr);
+//  tokenPtr->type = T_RIGHT_PAR;
+//  DLL_Init(&token_list);
+//  DLL_InsertLast(&token_list, tokenPtr);
   // Zavolani syntakticke analyzy
   start(&token_list);
 
