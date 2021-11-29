@@ -26,41 +26,23 @@ int main() {
 //    fprintf(stderr, "File can't be opened.\n");
 //    err_call(ERR_INTERNAL);
 //  }
+  token_type pole_type[23] = {T_K_REQUIRE, T_STRING, T_K_GLOBAL, T_ID, T_EOL, T_DOUBLE_DOT, T_EOL, T_K_FUNCTION, T_LEFT_PAR, T_EOL, T_RIGHT_PAR, T_EOL,
+                              T_K_GLOBAL, T_ID, T_EOL, T_DOUBLE_DOT, T_EOL, T_K_FUNCTION, T_LEFT_PAR, T_EOL, T_RIGHT_PAR, T_EOL, T_EOF};
 
   DLList token_list;
-  token_ptr tokenPtr = malloc(sizeof (struct token));
-  tokenPtr->type = T_K_REQUIRE;
   DLL_Init(&token_list);
-  DLL_InsertLast(&token_list, tokenPtr);
-  token_ptr tokenPtr0 = malloc(sizeof (struct token));
-  tokenPtr0->type = T_K_STRING;
-  //tokenPtr->data->string = "ifj21";
-  DLL_Init(&token_list);
-  DLL_InsertLast(&token_list, tokenPtr0);
-  token_ptr tokenPtr1 = malloc(sizeof (struct token));
-  tokenPtr1->type = T_K_GLOBAL;
-  DLL_Init(&token_list);
-  DLL_InsertLast(&token_list, tokenPtr1);
-  token_ptr tokenPtr2 = malloc(sizeof (struct token));
-  tokenPtr2->type = T_ID;
-  DLL_Init(&token_list);
-  DLL_InsertLast(&token_list, tokenPtr2);
-  token_ptr tokenPtr3 = malloc(sizeof (struct token));
-  tokenPtr3->type = T_DOUBLE_DOT;
-  DLL_Init(&token_list);
-  DLL_InsertLast(&token_list, tokenPtr3);
-//  tokenPtr->type = T_K_FUNCTION;
-//  DLL_Init(&token_list);
-//  DLL_InsertLast(&token_list, tokenPtr);
-//  tokenPtr->type = T_LEFT_PAR;
-//  DLL_Init(&token_list);
-//  DLL_InsertLast(&token_list, tokenPtr);
-//  tokenPtr->type = T_RIGHT_PAR;
-//  DLL_Init(&token_list);
-//  DLL_InsertLast(&token_list, tokenPtr);
+
+  for (int i = 0; i < 23; i++)
+  {
+      token_ptr tokenPtr = (token_ptr) malloc(sizeof (struct token));
+      tokenPtr->type = pole_type[i];
+      DLL_InsertLast(&token_list, tokenPtr);
+  }
+
   // Zavolani syntakticke analyzy
   start(&token_list);
 
+  fprintf(stdout, "%s", "Proslo to");
 //  int lex_return = get_token_list(&token_list);
 //  if(lex_return == 1)
 //  {

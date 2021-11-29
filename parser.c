@@ -14,8 +14,6 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
-DLList token_list;
-token_ptr token;
 
 #define GET_TOKEN()              \
     DLL_Next(&token_list);                          \
@@ -52,24 +50,25 @@ token_ptr token;
     && (token->next->type != T_STRLEN)  \
     ){}else {/*expression(); */}
 
+DLList token_list;
+token_ptr token;
 
-
-void start(DLList testlist)
+void start(DLList *testlist)
 {
-    DLL_Init(&token_list);
-    token_list = testlist;
+    token_list = *testlist;
     DLL_First(&token_list);
     DLL_GetFirst(&token_list, &token);
 //    if(get_token_list(&token_list) == ERR_LEX)
 //    {
 //        err_call(ERR_LEX);
 //    }
-    fprintf(stdout, "%u", token->type );
-    CHECK_TYPE(T_K_REQUIRE);
 
+    CHECK_TYPE(T_K_REQUIRE);
+    GET_TOKEN();
     if(token->type != T_STRING){
         err_call(ERR_SYNTAX);
     }
+    GET_TOKEN()
     main_list();
 
     GET_TOKEN()
@@ -117,8 +116,6 @@ void main_list(){
             main_next();
             break;
         case T_K_GLOBAL:
-            GET_TOKEN()
-            CHECK_TYPE(T_K_GLOBAL);
 
             GET_TOKEN()
             CHECK_TYPE(T_ID);
@@ -138,7 +135,14 @@ void main_list(){
             GET_TOKEN()
             CHECK_TYPE(T_RIGHT_PAR);
 
-            GET_TOKEN()
+            DLL_Next(&token_list);
+            DLL_GetValue(&token_list, &token);
+            while(token->type == T_EOL)
+            {
+              DLL_Next(&token_list);
+              DLL_GetValue(&token_list, &token);
+            }
+
             return_list_of_types();
 
             GET_TOKEN()
