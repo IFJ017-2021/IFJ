@@ -32,4 +32,20 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] =
 /* # */    {R, R, R, R, R, R, R, R, R, R, R, S, R, S, S, R, R},
 /* ..*/    {S, S, S, S, S, R, R, R, R, R, R, S, R, S, S, S, R},
 /* $ */    {S, S, S, S, S, S, S, S, S, S, S, S, X, S, S, S, X},
+};
+
+/*
+static prec_table_symbols get_symbol_from_token(token_ptr t){
+
+    switch (t->type)
+    {
+    case PLUS:
+        /* code */
+        break;
+    case MINUS:
+        break;
+    default:
+        return END_DOLLAR;
+    }
 }
+*/

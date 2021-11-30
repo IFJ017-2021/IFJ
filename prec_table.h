@@ -15,16 +15,16 @@ typedef enum{
     E,  // = equal
     R,  // > reduce
     X   // X error
-} prec_table_signs;
+} prec_table_actions;
 
 /**
- * @enum Precedence table indexes
+ * @enum Precedence table symbols
  * 
  */
 typedef enum{
     PLUS,           // +
     MINUS,          // -
-    MUL,            // *    
+    MUL,            // *
     DIV,            // /
     IDIV,           // //
     LT,             // <
@@ -39,4 +39,4 @@ typedef enum{
     LENGHT,         // #
     CONCAT,         // ..
     END_DOLLAR      // $
-} prec_table_indexes;
+} prec_table_symbols;
