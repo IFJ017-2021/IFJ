@@ -9,6 +9,7 @@
 
 #include "parser.h"
 #include "error.h"
+#include "symtable.h"
 #include "scanner.h"
 #include <stdio.h>
 #include <stdlib.h>
