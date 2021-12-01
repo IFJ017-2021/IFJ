@@ -7,6 +7,9 @@
  *  @author <xhajek51> Vojtěch Hájek
  */
 
+#ifndef parser_H
+#define parser_H
+
 /**
  * @brief Implementation START rule. <br>
  *  1) require "ifj21" MAIN_LIST <br>
@@ -160,3 +163,4 @@ void init_local_value();
 */
 void value_id_next();
 
+#endif

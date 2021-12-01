@@ -6,6 +6,9 @@
  *  @author <xvagne10> Dominik Vágner
  */
 
+#ifndef scanner_H
+#define scanner_H
+
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -137,3 +140,5 @@ void print_single_token(token_ptr token);
  * @return int State code, If there aren't any errors ? 0 : 2 
  */
 int lex_fsm(token_ptr *token);
+
+#endif

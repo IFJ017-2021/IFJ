@@ -6,6 +6,9 @@
  *  @author <xvasin11> Ladislav Vasina
  */
 
+#ifndef precTable_H
+#define precTable_H
+
 /**
  * @enum Precedence table symbols
  * 
@@ -40,3 +43,5 @@ typedef enum{
     CONCAT,         // ..
     END_DOLLAR      // $
 } prec_table_symbols;
+
+#endif
