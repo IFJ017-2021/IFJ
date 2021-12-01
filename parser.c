@@ -46,6 +46,7 @@
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
     && (token->next->type != T_CONCAT)                                          \
+    && (token->next->type != T_RIGHT_PAR)                                       \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
@@ -295,11 +296,9 @@ void param_next() {
   }
 }
 void entry_list_params(){
-    if((token->type == T_ID)
-    || (token->type == T_INT)
-    || (token->type == T_DOUBLE)
-    || (token->type == T_STRING)
-    || (token->type == T_STRLEN)){
+    if((token->type == T_ID) || (token->type == T_INT)
+    || (token->type == T_DOUBLE) || (token->type == T_STRING)
+    || (token->type == T_STRLEN) || (token->type == T_LEFT_PAR)){
         entry_param();
 
         GET_TOKEN()
@@ -331,7 +330,7 @@ void entry_param() {
         while (token->type != T_EOF){
             DLL_InsertLast(&expression_list, &token);
             if((token->type == T_ID) || (token->type == T_INT)
-               || (token->type == T_DOUBLE) || (token->type == T_STRING)){
+            || (token->type == T_DOUBLE) || (token->type == T_STRING)){
                 IS_EXPRESSION()
             } else{
                 GET_TOKEN()
@@ -389,7 +388,7 @@ void type_value() { IS_TYPE_VALUE(); }
 void return_list() {
   if (token->type == T_ID || token->type == T_STRING
   || token->type == T_INT || token->type == T_DOUBLE
-  || token->type == T_STRLEN) {
+  || token->type == T_STRLEN || token->type == T_LEFT_PAR) {
       if((token->type == T_ID)
          && (token->next->type != T_ASSIGN)
          && (token->next->type != T_EQL)
@@ -416,7 +415,6 @@ void return_list() {
           GET_TOKEN()
           return_value_next();
         } else {
-          GET_TOKEN()
           return_value_next();
         }
       } else{
@@ -499,9 +497,9 @@ void state_else() {
   }
 }
 void init_value() {
-  if (/*expression*/ (token->type == T_ID) || (token->type == T_INT) ||
-  (token->type == T_DOUBLE) || (token->type == T_STRING)
-  || (token->type == T_STRLEN)) {
+  if ((token->type == T_ID) || (token->type == T_INT)
+  ||(token->type == T_DOUBLE) || (token->type == T_STRING)
+  || (token->type == T_STRLEN)|| token->type == T_LEFT_PAR) {
     if((token->type == T_ID)
     && (token->next->type != T_ASSIGN)
     && (token->next->type != T_EQL)
