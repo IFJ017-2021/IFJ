@@ -45,6 +45,7 @@
     && (token->next->type != T_DIV)                                             \
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
+    && (token->next->type != T_CONCAT)                                          \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
@@ -321,7 +322,8 @@ void entry_param() {
        && (token->next->type != T_ADD)
        && (token->next->type != T_DIV)
        && (token->next->type != T_IDIV)
-       && (token->next->type != T_STRLEN)){
+       && (token->next->type != T_STRLEN)
+       && (token->next->type != T_CONCAT)){
         return;
     } else{
         DLList expression_list;
@@ -401,7 +403,8 @@ void return_list() {
          && (token->next->type != T_ADD)
          && (token->next->type != T_DIV)
          && (token->next->type != T_IDIV)
-         && (token->next->type != T_STRLEN)){
+         && (token->next->type != T_STRLEN)
+         && (token->next->type != T_CONCAT)){
         GET_TOKEN()
         if (token->type == T_LEFT_PAR) {
           GET_TOKEN()
@@ -451,7 +454,8 @@ void return_value_next() {
          && (token->next->type != T_ADD)
          && (token->next->type != T_DIV)
          && (token->next->type != T_IDIV)
-         && (token->next->type != T_STRLEN)){
+         && (token->next->type != T_STRLEN)
+         && (token->next->type != T_CONCAT)){
           GET_TOKEN()
           if (token->type == T_LEFT_PAR) {
               GET_TOKEN()
@@ -511,7 +515,8 @@ void init_value() {
     && (token->next->type != T_ADD)
     && (token->next->type != T_DIV)
     && (token->next->type != T_IDIV)
-    && (token->next->type != T_STRLEN)){
+    && (token->next->type != T_STRLEN)
+    && (token->next->type != T_CONCAT)){
         if(token->next->type == T_LEFT_PAR) {
             GET_TOKEN()
             CHECK_TYPE(T_LEFT_PAR);
