@@ -14,25 +14,17 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int get_token_list(token_ptr *first) {
-  token_ptr prev = NULL;
+int get_token_list(DLList *list) {
+  token_ptr new = NULL;
 
-  while (prev == NULL || prev->type != T_EOF) {
-    token_ptr new;
+  while (new == NULL || new->type != T_EOF) {
+    new = NULL;
     int error = get_single_token(&new);
-
-    if (prev == NULL) {
-      *first = new;
-    } else {
-      prev->next = new;
-      new->prev = prev;
-      prev = new;
-    }
-
     if (error) {
       // TODO destroy list
       return ERR_LEX;
     }
+    DLL_InsertLast(list, new);
   }
 
   return 0;
@@ -45,13 +37,18 @@ int get_single_token(token_ptr *insert_into) {
     return ERR_INTERNAL;
   }
 
+  (*insert_into)->data = (token_data) malloc(sizeof(union tok_data));
+  if ((*insert_into)->data == NULL) {
+     return ERR_INTERNAL;
+  }
+
   (*insert_into)->data->string = NULL;
   (*insert_into)->next = NULL;
   (*insert_into)->prev = NULL;
 
   lex_fsm(insert_into);
 
-  is_token_keyword(insert_into);
+//  is_token_keyword(insert_into);
 
   return 0;
 };
@@ -72,7 +69,7 @@ int lex_fsm(token_ptr *token) {
 
   static uint8_t escape_code = 0;
 
-  string *read_input;
+  string *read_input = NULL;
   strInit(read_input);
 
   (*token)->type = T_OTHER;
@@ -81,7 +78,7 @@ int lex_fsm(token_ptr *token) {
 
   while (fsm_activator) {
     char current = getc(stdin);
-    col_num == 1 ?: col_num++;
+    col_num == 1 ? true : col_num++;
     strAppendChar(read_input, current);
     nstate = S_NULL;
 
@@ -127,6 +124,7 @@ int lex_fsm(token_ptr *token) {
         nstate = S_EOF;
       else if (isspace(current))
         nstate = S_SPACE;
+      break;
 
     case S_SPACE:
       if (current != '\n' && isspace(current))
