@@ -24,12 +24,12 @@
 
 #define CHECK_TYPE(_type)                                                      \
   if (token->type != (_type))                                                  \
-  err_call(ERR_SYNTAX)
+  err_call(ERR_SYNTAX, token)
 
-#define IS_TYPE_VALUE()                                                         \
-  if ((token->type != T_K_INTEGER) && (token->type != T_K_STRING) &&            \
-      (token->type != T_K_NUMBER) && (token->type != T_K_NIL))                  \
-  err_call(ERR_SYNTAX)
+#define IS_TYPE_VALUE()                                                  \
+  if ((token->type != T_K_NUMBER) && (token->type != T_K_INTEGER) &&                 \
+      (token->type != T_K_STRING) && (token->type != T_K_NIL))                    \
+  err_call(ERR_SYNTAX, token)
 
 #define  IS_EXPRESSION() \
     if((token->next->type != T_ASSIGN)  \
@@ -64,10 +64,11 @@ void start(DLList *testlist) {
   //    {
   //        err_call(ERR_LEX);
   //    }
+
   CHECK_TYPE(T_K_REQUIRE);
   GET_TOKEN()
   if (token->type != T_STRING && strcmp(token->data->string, "ifj21") != 0) {
-    err_call(ERR_SYNTAX);
+    err_call(ERR_SYNTAX, token);
   }
   GET_TOKEN()
   main_list();
@@ -148,7 +149,7 @@ void main_list() {
     main_next();
     break;
   default:
-    err_call(ERR_SYNTAX);
+    err_call(ERR_SYNTAX, token);
     break;
   }
 }
@@ -200,7 +201,7 @@ void statement() {
     type_value();
 
     GET_TOKEN()
-    init_value();
+    init_local_value();
 
     GET_TOKEN()
     statement();
@@ -313,7 +314,7 @@ void entry_list_params(){
   }
 }
 void entry_param() {
-//IS_EXPRESSION();
+IS_EXPRESSION()
 }
 
 void entry_param_next() {
@@ -413,14 +414,19 @@ void init_value() {
     && (token->next->type != T_DIV)
     && (token->next->type != T_IDIV)
     && (token->next->type != T_STRLEN)){
-          GET_TOKEN()
-          CHECK_TYPE(T_LEFT_PAR);
+        if(token->next->type == T_LEFT_PAR) {
+            GET_TOKEN()
+            CHECK_TYPE(T_LEFT_PAR);
 
-          GET_TOKEN()
-          entry_list_params();
+            GET_TOKEN()
+            entry_list_params();
 
-          GET_TOKEN()
-          CHECK_TYPE(T_RIGHT_PAR);
+            GET_TOKEN()
+            CHECK_TYPE(T_RIGHT_PAR);
+        }else{
+
+        }
+
     } else {
         while (token->next->type != T_EOF){
             switch (token->type) {

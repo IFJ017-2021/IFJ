@@ -7,6 +7,10 @@
  */
 
 
+#ifndef STRING_H
+#define STRING_H
+
+
 /**
  * @brief string structure
  */
@@ -28,3 +32,5 @@ int strCompareConstant(string *s1, char *s2);
 char *strGetString(string *s);
 int strGetLength(string *s);
 int strGetCapacity(string *s);
+
+#endif

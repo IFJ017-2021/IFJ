@@ -37,7 +37,7 @@ int main(int argc, char *argv[]) {
     // Zavolani syntakticke analyzy
     start(&token_list);
   } else {
-    err_call(ERR_LEX);
+    err_call(ERR_LEX, NULL);
   }
 
   fprintf(stdout, "%s", "Proslo to");

@@ -66,7 +66,7 @@ void DLL_GetFirst(DLList *list, token_ptr *token) {
   if (list->first != NULL) {
     *token = list->first;
   } else {
-    err_call(ERR_INTERNAL);
+    err_call(ERR_INTERNAL, NULL);
   }
 } /*DLL_GetFirst*/
 
@@ -74,7 +74,7 @@ void DLL_GetLast(DLList *list, token_ptr *token) {
   if (list->first != NULL) {
     *token = list->last;
   } else {
-    err_call(ERR_INTERNAL);
+    err_call(ERR_INTERNAL, NULL);
   }
 } /*DLL_GetLast*/
 
@@ -192,7 +192,7 @@ void DLL_GetValue(DLList *list, token_ptr *token) {
   if (list->active != NULL) {
     *token = list->active;
   } else {
-    err_call(ERR_INTERNAL);
+    err_call(ERR_INTERNAL, NULL);
   }
 } /*DLL_GetValue*/
 
