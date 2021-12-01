@@ -30,7 +30,7 @@ typedef enum{
     LT,             // <
     GT,             // >
     LEQ,            // <=
-    MEQ,            // >=
+    GEQ,            // >=
     NEQ,            // ~=
     EQ,             // ==
     LEFT_BRACKET,   // (
