@@ -26,21 +26,27 @@
   if (token->type != (_type))                                                  \
   err_call(ERR_SYNTAX)
 
-#define IS_TYPE_VALUE(_token)                                                  \
+#define IS_TYPE_VALUE()                                                  \
   if ((_token->type != T_DOUBLE) && (_token->type != T_INT) &&                 \
       (_token->type != T_STRING) && (_token->type != T_ID))                    \
   err_call(ERR_SYNTAX)
 
-#define IS_EXPRESSION(token)                                                   \
-  if ((token->type == T_ID) && (token->next->type != T_ASSIGN) &&              \
-      (token->next->type != T_EQL) && (token->next->type != T_GT) &&           \
-      (token->next->type != T_GTE) && (token->next->type != T_LT) &&           \
-      (token->next->type != T_LTE) && (token->next->type != T_NEQL) &&         \
-      (token->next->type != T_MUL) && (token->next->type != T_SUB) &&          \
-      (token->next->type != T_ADD) && (token->next->type != T_DIV) &&          \
-      (token->next->type != T_IDIV) && (token->next->type != T_STRLEN)) {      \
-  } else { /*expression(); */                                                  \
-  }
+#define  IS_EXPRESSION() \
+    if((token->type == T_ID)          \
+    && (token->next->type != T_ASSIGN)  \
+    && (token->next->type != T_EQL)     \
+    && (token->next->type != T_GT)      \
+    && (token->next->type != T_GTE)     \
+    && (token->next->type != T_LT)      \
+    && (token->next->type != T_LTE)     \
+    && (token->next->type != T_NEQL)    \
+    && (token->next->type != T_MUL)     \
+    && (token->next->type != T_SUB)     \
+    && (token->next->type != T_ADD)     \
+    && (token->next->type != T_DIV)     \
+    && (token->next->type != T_IDIV)    \
+    && (token->next->type != T_STRLEN)  \
+    ){}else {/*expression(); */}
 
 DLList token_list;
 token_ptr token;
@@ -49,6 +55,9 @@ void start(DLList *testlist) {
   token_list = *testlist;
   DLL_First(&token_list);
   DLL_GetFirst(&token_list, &token);
+  if(token->type == T_EOL || token->type == T_OTHER){
+      GET_TOKEN();
+  }
   //    if(get_token_list(&token_list) == ERR_LEX)
   //    {
   //        err_call(ERR_LEX);
@@ -64,7 +73,6 @@ void start(DLList *testlist) {
 
   GET_TOKEN()
   CHECK_TYPE(T_EOF);
-  return;
 }
 void main_list() {
   switch (token->type) {
@@ -199,6 +207,15 @@ void statement() {
   case T_K_IF:
     GET_TOKEN()
     // expression();
+    DLList expression_list_if;
+    DLL_Init(&expression_list_if);
+    while (token->next->type != T_K_THEN){
+        token_ptr expression_token = (token_ptr) malloc(sizeof (struct token));
+        expression_token = token;
+        DLL_InsertLast(&expression_list_if, expression_token);
+        GET_TOKEN()
+    }
+    //expression(&expression_list_if);
 
     GET_TOKEN()
     CHECK_TYPE(T_K_THEN);
@@ -224,8 +241,15 @@ void statement() {
     break;
   case T_K_WHILE:
     GET_TOKEN()
-    // expression();
-
+    DLList expression_list_while;
+    DLL_Init(&expression_list_while);
+    while (token->next->type != T_K_DO){
+        token_ptr expression_token = (token_ptr) malloc(sizeof (struct token));
+        expression_token = token;
+        DLL_InsertLast(&expression_list_while, expression_token);
+        GET_TOKEN()
+    }
+    //expression(&expression_list_while);
     GET_TOKEN()
     CHECK_TYPE(T_K_DO);
 
@@ -274,10 +298,12 @@ void param_next() {
     DLL_Previous(&token_list);
   }
 }
-void entry_list_params() {
-  if (/*expression*/ (token->type == T_ID) || (token->type == T_INT) ||
-      (token->type == T_DOUBLE) || (token->type == T_STRING)) {
-    entry_param();
+void entry_list_params(){
+    if(/*expression*/ (token->type == T_ID)
+    || (token->type == T_INT)
+    || (token->type == T_DOUBLE)
+    || (token->type == T_STRING)){
+        entry_param();
 
     GET_TOKEN()
     entry_param_next();
@@ -285,7 +311,10 @@ void entry_list_params() {
     DLL_Previous(&token_list);
   }
 }
-void entry_param() { IS_EXPRESSION(token) }
+void entry_param() {
+IS_EXPRESSION()
+}
+
 void entry_param_next() {
   if (token->type == T_COMMA) {
     GET_TOKEN()
