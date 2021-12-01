@@ -125,14 +125,14 @@ char *strGetString(string *s){
 /**
  * @brief returns lenght of string 's'
  */
-char strGetLength(string *s){
+int strGetLength(string *s){
     return s->length;
 }
 
 /**
  * @brief returns data size (capacity) of string 's'
  */
-char strGetCapacity(string *s){
+int strGetCapacity(string *s){
     return s->capacity;
 }
 
