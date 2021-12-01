@@ -35,9 +35,9 @@ void main_next();
 
 /**
  * @brief Implementation of STATEMENT rule. <br>
- *  1) value_id VALUE_ID_NEXT = INIT_VALUE INIT_VALUE_NEXT<br>
- *  2) local value_id = TYPE_VALUE INIT_VALUE <br>
- *  3) function_id (ENTRY_LIST_PARAMS) <br>
+ *  1) value_id VALUE_ID_NEXT = INIT_VALUE INIT_VALUE_NEXT STATEMENT<br>
+ *  2) local value_id : TYPE_VALUE INIT_LOCAL_VALUE STATENEBT <br>
+ *  3) function_id (ENTRY_LIST_PARAMS) STATEMENT <br>
  *  4) if expression then STATEMENT STATE_ELSE end STATEMENT <br>
  *  5) return RETURN_LIST STATEMENT <br>
  *  6) while expression do STATEMENT end STATEMENT <br>
@@ -138,6 +138,7 @@ void state_else();
  * @brief Implementation of INIT_VALUE rule. <br>
  * 1) expression <br>
  * 2) function_id(ENTRY_LIST_PARAMS) <br>
+ * 3) value_id <br>
  * @param ... ?
 */
 void init_value();

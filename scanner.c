@@ -8,6 +8,7 @@
 
 #include "scanner.h"
 #include "error.h"
+#include "tokenList.h"
 #include <ctype.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -24,7 +25,9 @@ int get_token_list(DLList *list) {
       // TODO destroy list
       return ERR_LEX;
     }
-    DLL_InsertLast(list, new);
+    if(new->type != T_OTHER) {
+        DLL_InsertLast(list, new);
+    }
   }
 
   return 0;
@@ -55,6 +58,7 @@ int get_single_token(token_ptr *insert_into) {
   if ((*insert_into)->type == T_ID)
     is_token_keyword(insert_into);
 
+  print_single_token(*insert_into);
   return 0;
 }
 
@@ -124,16 +128,16 @@ void print_token_list(DLList *list) {
 void print_single_token(token_ptr token) {
   if (token != NULL) {
     const char *token_type_strings[] = {
-        "T_OTHER",    "T_EOL",      "T_EOF",       "T_SUB",
-        "T_ADD",      "T_MUL",      "T_DIV",       "T_IDIV",
-        "T_STRLEN",   "T_LEFT_PAR", "T_RIGHT_PAR", "T_DOUBLE_DOT",
-        "T_ASSIGN",   "T_EQL",      "T_GT",        "T_GTE",
-        "T_LT",       "T_LTE",      "T_NEQL",      "T_COMMA",
-        "T_ID",       "T_INT",      "T_DOUBLE",    "T_STRING",
-        "T_K_DO",     "T_K_ELSE",   "T_K_END",     "T_K_FUNCTION",
-        "T_K_GLOBAL", "T_K_IF",     "T_K_INTEGER", "T_K_LOCAL",
-        "T_K_NIL",    "T_K_NUMBER", "T_K_REQUIRE", "T_K_RETURN",
-        "T_K_STRING", "T_K_THEN",   "T_K_WHILE"};
+        "T_OTHER",      "T_EOL",      "T_EOF",       "T_SUB",
+        "T_ADD",        "T_MUL",      "T_DIV",       "T_IDIV",
+        "T_STRLEN",     "T_LEFT_PAR", "T_RIGHT_PAR", "T_DOUBLE_DOT",
+        "T_ASSIGN",     "T_EQL",      "T_GT",        "T_GTE",
+        "T_LT",         "T_LTE",      "T_NEQL",      "T_CONCAT",
+        "T_COMMA",      "T_ID",       "T_INT",       "T_DOUBLE",
+        "T_STRING",     "T_K_DO",     "T_K_ELSE",    "T_K_END",
+        "T_K_FUNCTION", "T_K_GLOBAL", "T_K_IF",      "T_K_INTEGER",
+        "T_K_LOCAL",    "T_K_NIL",    "T_K_NUMBER",  "T_K_REQUIRE",
+        "T_K_RETURN",   "T_K_STRING", "T_K_THEN",    "T_K_WHILE"};
 
     fprintf(
         stdout,
@@ -190,9 +194,11 @@ int lex_fsm(token_ptr *token) {
       else if (current == ':')
         nstate = S_DOUBLE_DOT;
       else if (current == '=')
-        nstate = S_EQL;
+        nstate = S_ASSIGN;
       else if (current == '>')
         nstate = S_GT;
+      else if (current == '.')
+        nstate = S_DOT0;
       else if (current == '<')
         nstate = S_LT;
       else if (current == ',')
@@ -470,13 +476,13 @@ int lex_fsm(token_ptr *token) {
 
     case S_DOT0:
       if (current == '.')
-        nstate = S_DOUBLE_DOT;
+        nstate = S_DOT1;
       else
         nstate = S_ERR;
       break;
 
     case S_DOT1:
-      (*token)->type = T_DOUBLE_DOT;
+      (*token)->type = T_CONCAT;
       break;
 
     case S_TILDA:

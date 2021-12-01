@@ -37,6 +37,7 @@ typedef enum {
     T_LT,           // <
     T_LTE,          // <=
     T_NEQL,         // ~=
+    T_CONCAT,
     T_COMMA,
     T_ID,
     T_INT,

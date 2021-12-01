@@ -13,7 +13,7 @@
 void err_call(int error, token_ptr token) {
     switch (error) {
         case ERR_LEX:
-            fprintf(stderr, "ERR 1 - Lexical error\n");
+            fprintf(stderr, "ERR 1 - Lexical error");
             break;
         case ERR_SYNTAX:
             fprintf(stderr, "ERR 2 - Syntax error");
