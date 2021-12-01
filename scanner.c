@@ -8,30 +8,24 @@
 
 #include "scanner.h"
 #include "error.h"
+#include "str.h"
 #include <ctype.h>
 #include <malloc.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-int get_token_list(token_ptr *first) {
-  token_ptr prev = NULL;
+int get_token_list(DLList *list) {
+  token_ptr new = NULL;
 
-  while (prev == NULL || prev->type != T_EOF) {
+  while (new == NULL || new->type != T_EOF) {
     token_ptr new;
     int error = get_single_token(&new);
-
-    if (prev == NULL) {
-      *first = new;
-    } else {
-      prev->next = new;
-    }
-    new->prev = prev;
-    prev = new;
-
     if (error) {
+        // TODO destroy list
       return ERR_LEX;
     }
+    DLL_InsertLast(list, new);
   }
 
   return 0;

@@ -24,6 +24,13 @@ void start();
 void main_list();
 
 /**
+ * @brief Implementation of MAIN_NEXT rule. <br>
+ * 1) MAIN_LIST
+ * @param ... ?
+ */
+void main_next();
+
+/**
  * @brief Implementation of STATEMENT rule. <br>
  *  1) value_id VALUE_ID_NEXT = INIT_VALUE INIT_VALUE_NEXT<br>
  *  2) local value_id = TYPE_VALUE INIT_VALUE <br>

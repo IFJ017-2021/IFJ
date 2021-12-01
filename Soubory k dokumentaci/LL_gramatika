@@ -1,5 +1,5 @@
 START                   ->          require "ifj21" MAIN_LIST eof
-MAIN_LIST 	            ->          function function_id (LIST_OF_PARAMS) RETURN_LIST_OF_PARAMS STATEMENT end MAIN_NEXT
+MAIN_LIST 	            ->          function function_id (LIST_OF_PARAMS) RETURN_LIST_OF_TYPES STATEMENT end MAIN_NEXT
 MAIN_LIST	            ->          function_id(ENTRY_LIST_PARAMS) MAIN_NEXT
 MAIN_LIST	            ->          global function_id : function (LIST_OF_TYPES) RETURN_LIST_OF_TYPES MAIN_NEXT
 MAIN_NEXT               ->          MAIN_LIST

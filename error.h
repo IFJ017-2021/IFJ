@@ -20,10 +20,10 @@
 #define ERR_RUN_ZERODIV     9
 #define ERR_INTERNAL        99
 
+#endif
+
 /**
  * @brief Implementation of printing error codes <br>
  * @param error code number
  */
- void err_call(int error);
-
-#endif
+void err_call(int error);

@@ -5,10 +5,8 @@
  *
  *  @author <xhajek51> Vojtěch Hájek
  */
-#include "scanner.h"
 #include "error.h"
 #include "str.h"
-#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -39,7 +37,7 @@ void err_call(int error) {
             fprintf(stderr, "ERR 8 - Runtime error when working with unexpected nil value");
             break;
         case ERR_RUN_ZERODIV :
-            fprintf(stderr, "ERR 9 - Runtime error of integer division by zero constant ")
+            fprintf(stderr, "ERR 9 - Runtime error of integer division by zero constant ");
             break;
         case ERR_INTERNAL:
             fprintf(stderr, "ERR 99 - Internal compiler error");
