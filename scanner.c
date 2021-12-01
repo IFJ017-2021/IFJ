@@ -190,7 +190,7 @@ int lex_fsm(token_ptr *token) {
       else if (current == ':')
         nstate = S_DOUBLE_DOT;
       else if (current == '=')
-        nstate = S_EQL;
+        nstate = S_ASSIGN;
       else if (current == '>')
         nstate = S_GT;
       else if (current == '<')
