@@ -20,10 +20,12 @@
 #define ERR_RUN_ZERODIV     9
 #define ERR_INTERNAL        99
 
-#endif
+#include "tokenList.h"
 
 /**
  * @brief Implementation of printing error codes <br>
  * @param error code number
  */
-void err_call(int error);
+void err_call(int error, token_ptr token);
+
+#endif

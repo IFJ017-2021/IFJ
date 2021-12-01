@@ -6,6 +6,10 @@
  *  @author <xpoliv06> Tomáš Polívka
  *  @author <xhajek51> Vojtěch Hájek
  */
+
+#ifndef tokenList_H
+#define tokenList_H
+
 #include <stdio.h>
 #include <stdlib.h>
 #include "str.h"
@@ -209,3 +213,5 @@ void DLL_Previous(DLList *list);
  * @return 0 - is not active
  */
 int DLL_IsActive(DLList *list);
+
+#endif

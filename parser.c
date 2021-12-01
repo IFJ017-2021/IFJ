@@ -24,12 +24,12 @@
 
 #define CHECK_TYPE(_type)                                                      \
   if (token->type != (_type))                                                  \
-  err_call(ERR_SYNTAX)
+  err_call(ERR_SYNTAX, token)
 
 #define IS_TYPE_VALUE()                                                  \
-  if ((_token->type != T_DOUBLE) && (_token->type != T_INT) &&                 \
-      (_token->type != T_STRING) && (_token->type != T_ID))                    \
-  err_call(ERR_SYNTAX)
+  if ((token->type != T_K_NUMBER) && (token->type != T_K_INTEGER) &&                 \
+      (token->type != T_K_STRING) && (token->type != T_K_NIL))                    \
+  err_call(ERR_SYNTAX, token)
 
 #define  IS_EXPRESSION() \
     if((token->type == T_ID)          \
@@ -66,7 +66,7 @@ void start(DLList *testlist) {
   CHECK_TYPE(T_K_REQUIRE);
   GET_TOKEN();
   if (token->type != T_STRING) {
-    err_call(ERR_SYNTAX);
+    err_call(ERR_SYNTAX, token);
   }
   GET_TOKEN()
   main_list();
@@ -147,7 +147,7 @@ void main_list() {
     main_next();
     break;
   default:
-    err_call(ERR_SYNTAX);
+    err_call(ERR_SYNTAX, token);
     break;
   }
 }
@@ -359,7 +359,7 @@ void type_next() {
     DLL_Previous(&token_list);
   }
 }
-void type_value() { IS_TYPE_VALUE(token); }
+void type_value() { IS_TYPE_VALUE(); }
 void return_list() {
   if (token->type == T_ID) {
     GET_TOKEN()
