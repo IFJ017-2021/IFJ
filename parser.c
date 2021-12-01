@@ -42,6 +42,7 @@
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
     && (token->next->type != T_CONCAT)                                          \
+    && (token->next->type != T_RIGHT_PAR)                                       \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
