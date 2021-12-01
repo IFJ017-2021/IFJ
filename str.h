@@ -12,7 +12,7 @@
  */
 
 typedef struct{
-    char *data;    // Var to store the string
+    char* data;    // Var to store the string
     int length;   // String lenght
     int capacity; // Memory allocated
 } string;
