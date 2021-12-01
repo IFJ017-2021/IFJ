@@ -24,7 +24,9 @@ int get_token_list(DLList *list) {
       // TODO destroy list
       return ERR_LEX;
     }
-    DLL_InsertLast(list, new);
+    if(new->type != T_OTHER) {
+        DLL_InsertLast(list, new);
+    }
   }
 
   return 0;
@@ -190,7 +192,7 @@ int lex_fsm(token_ptr *token) {
       else if (current == ':')
         nstate = S_DOUBLE_DOT;
       else if (current == '=')
-        nstate = S_EQL;
+        nstate = S_ASSIGN;
       else if (current == '>')
         nstate = S_GT;
       else if (current == '<')

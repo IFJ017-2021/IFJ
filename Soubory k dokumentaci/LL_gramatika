@@ -28,8 +28,9 @@ STATEMENT	            ->          return RETURN_LIST STATEMENT
 STATEMENT	            ->          while expression do STATEMENT end STATEMENT
 STATEMENT	            ->          ε
 RETURN_LIST    	        ->          ε
-RETURN_LIST    	        ->          function_id(ENTRY_LIST_PARAMS)
+RETURN_LIST    	        ->          function_id(ENTRY_LIST_PARAMS) RETURN_VALUE_NEXT
 RETURN_LIST             ->          value_id RETURN_VALUE_NEXT
+RETURN_LIST             ->          expression RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          , value_id RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          ε
 STATE_ELSE        	    ->          else STATEMENT
