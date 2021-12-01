@@ -53,10 +53,10 @@ void start(DLList *testlist) {
   //    {
   //        err_call(ERR_LEX);
   //    }
-
+  GET_TOKEN()
   CHECK_TYPE(T_K_REQUIRE);
-  GET_TOKEN();
-  if (token->type != T_STRING) {
+  GET_TOKEN()
+  if (token->type != T_STRING && strcmp(token->data->string, "ifj21")) {
     err_call(ERR_SYNTAX);
   }
   GET_TOKEN()
