@@ -17,11 +17,7 @@
 
 #define GET_TOKEN()                                                            \
   DLL_Next(&token_list);                                                       \
-  DLL_GetValue(&token_list, &token);                                           \
-  while (token->type == T_EOL) {                                               \
-    DLL_Next(&token_list);                                                     \
-    DLL_GetValue(&token_list, &token);                                         \
-  }
+  DLL_GetValue(&token_list, &token);
 
 #define CHECK_TYPE(_type)                                                      \
   if (token->type != (_type))                                                  \
@@ -52,7 +48,10 @@
     else{                                                                       \
         GET_TOKEN()                                                             \
     }
-
+#define INIT_TOKEN_POINTER()                                                    \
+        token_ptr tmp = (token_ptr) malloc(sizeof (struct token));              \
+        tmp->type = token->type;                                                \
+        tmp->data = token->data;
 DLList token_list;
 token_ptr token;
 
@@ -211,13 +210,18 @@ void statement() {
     GET_TOKEN()
     DLList expression_list_if;
     DLL_Init(&expression_list_if);
-    while (token->next->type != T_K_THEN){
-        DLL_InsertLast(&expression_list_if, &token);
+    while (token->type != T_K_THEN && token->type != T_EOF){
+        INIT_TOKEN_POINTER()
+        DLL_InsertLast(&expression_list_if, tmp);
+        if(token->type == T_LEFT_PAR){
+            GET_TOKEN()
+            expression_par_tmp(&expression_list_if);
+        }
         GET_TOKEN()
     }
     //expression(&expression_list_if);
 
-    GET_TOKEN()
+
     CHECK_TYPE(T_K_THEN);
 
     GET_TOKEN()
@@ -243,12 +247,16 @@ void statement() {
     GET_TOKEN()
     DLList expression_list_while;
     DLL_Init(&expression_list_while);
-    while (token->next->type != T_K_DO){
-        DLL_InsertLast(&expression_list_while, &token);
+    while (token->type != T_K_DO && token->type != T_EOF){
+        INIT_TOKEN_POINTER()
+        DLL_InsertLast(&expression_list_if, tmp);
+        if(token->type == T_LEFT_PAR){
+            GET_TOKEN()
+            expression_par_tmp(&expression_list_if);
+        }
         GET_TOKEN()
     }
     //expression(&expression_list_while);
-    GET_TOKEN()
     CHECK_TYPE(T_K_DO);
 
     GET_TOKEN()
@@ -329,7 +337,11 @@ void entry_param() {
         DLList expression_list;
         DLL_Init(&expression_list);
         while (token->type != T_EOF){
-            DLL_InsertLast(&expression_list, &token);
+            INIT_TOKEN_POINTER()
+            DLL_InsertLast(&expression_list, tmp);
+            if(token->type == T_LEFT_PAR){
+                expression_par_tmp(&expression_list);
+            }
             if((token->type == T_ID) || (token->type == T_INT)
             || (token->type == T_DOUBLE) || (token->type == T_STRING)){
                 IS_EXPRESSION()
@@ -422,7 +434,11 @@ void return_list() {
           DLList expression_list;
           DLL_Init(&expression_list);
           while (token->type != T_EOF){
-              DLL_InsertLast(&expression_list, &token);
+              INIT_TOKEN_POINTER()
+              DLL_InsertLast(&expression_list, tmp);
+              if(token->type == T_LEFT_PAR){
+                  expression_par_tmp(&expression_list);
+              }
               if((token->type == T_ID) || (token->type == T_INT)
                  || (token->type == T_DOUBLE) || (token->type == T_STRING)){
                   IS_EXPRESSION()
@@ -473,7 +489,11 @@ void return_value_next() {
           DLList expression_list;
           DLL_Init(&expression_list);
           while (token->type != T_EOF){
-              DLL_InsertLast(&expression_list, &token);
+              INIT_TOKEN_POINTER()
+              DLL_InsertLast(&expression_list, tmp);
+              if(token->type == T_LEFT_PAR){
+                  expression_par_tmp(&expression_list);
+              }
               if((token->type == T_ID) || (token->type == T_INT)
               || (token->type == T_DOUBLE) || (token->type == T_STRING)){
                   IS_EXPRESSION()
@@ -530,7 +550,11 @@ void init_value() {
         DLList expression_list;
         DLL_Init(&expression_list);
         while (token->type != T_EOF){
-            DLL_InsertLast(&expression_list, &token);
+            INIT_TOKEN_POINTER()
+            DLL_InsertLast(&expression_list, tmp);
+            if(token->type == T_LEFT_PAR){
+                expression_par_tmp(&expression_list);
+            }
             if((token->type == T_ID) || (token->type == T_INT)
                || (token->type == T_DOUBLE) || (token->type == T_STRING)){
                 IS_EXPRESSION()
@@ -573,4 +597,19 @@ void value_id_next() {
   } else {
     DLL_Previous(&token_list);
   }
+}
+void expression_par_tmp(DLList *list){
+    while (token->type != T_RIGHT_PAR){
+        INIT_TOKEN_POINTER()
+        if(token->type == T_LEFT_PAR){
+            DLL_InsertLast(list, tmp);
+            GET_TOKEN()
+            expression_par_tmp(list);
+        } else{
+            DLL_InsertLast(list, tmp);
+        }
+        GET_TOKEN()
+    }
+    INIT_TOKEN_POINTER()
+    DLL_InsertLast(list, tmp);
 }
