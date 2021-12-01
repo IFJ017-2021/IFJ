@@ -26,21 +26,27 @@
   if (token->type != (_type))                                                  \
   err_call(ERR_SYNTAX)
 
-#define IS_TYPE_VALUE(_token)                                                  \
+#define IS_TYPE_VALUE()                                                  \
   if ((_token->type != T_DOUBLE) && (_token->type != T_INT) &&                 \
       (_token->type != T_STRING) && (_token->type != T_ID))                    \
   err_call(ERR_SYNTAX)
 
-#define IS_EXPRESSION(token)                                                   \
-  if ((token->type == T_ID) && (token->next->type != T_ASSIGN) &&              \
-      (token->next->type != T_EQL) && (token->next->type != T_GT) &&           \
-      (token->next->type != T_GTE) && (token->next->type != T_LT) &&           \
-      (token->next->type != T_LTE) && (token->next->type != T_NEQL) &&         \
-      (token->next->type != T_MUL) && (token->next->type != T_SUB) &&          \
-      (token->next->type != T_ADD) && (token->next->type != T_DIV) &&          \
-      (token->next->type != T_IDIV) && (token->next->type != T_STRLEN)) {      \
-  } else { /*expression(); */                                                  \
-  }
+#define  IS_EXPRESSION() \
+    if((token->type == T_ID)          \
+    && (token->next->type != T_ASSIGN)  \
+    && (token->next->type != T_EQL)     \
+    && (token->next->type != T_GT)      \
+    && (token->next->type != T_GTE)     \
+    && (token->next->type != T_LT)      \
+    && (token->next->type != T_LTE)     \
+    && (token->next->type != T_NEQL)    \
+    && (token->next->type != T_MUL)     \
+    && (token->next->type != T_SUB)     \
+    && (token->next->type != T_ADD)     \
+    && (token->next->type != T_DIV)     \
+    && (token->next->type != T_IDIV)    \
+    && (token->next->type != T_STRLEN)  \
+    ){}else {/*expression(); */}
 
 DLList token_list;
 token_ptr token;
@@ -64,7 +70,6 @@ void start(DLList *testlist) {
 
   GET_TOKEN()
   CHECK_TYPE(T_EOF);
-  return;
 }
 void main_list() {
   switch (token->type) {
