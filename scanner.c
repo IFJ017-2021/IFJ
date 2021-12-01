@@ -8,6 +8,7 @@
 
 #include "scanner.h"
 #include "error.h"
+#include "tokenList.h"
 #include <ctype.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -93,7 +94,7 @@ bool is_token_keyword(token_ptr *token) {
     (*token)->type = T_K_WHILE;
 
   if ((*token)->type != T_ID) {
-    strClear((*token)->data->string);
+    strFree((*token)->data->string);
   }
 
   return false;
@@ -125,16 +126,16 @@ void print_token_list(DLList *list) {
 void print_single_token(token_ptr token) {
   if (token != NULL) {
     const char *token_type_strings[] = {
-        "T_OTHER",    "T_EOL",      "T_EOF",       "T_SUB",
-        "T_ADD",      "T_MUL",      "T_DIV",       "T_IDIV",
-        "T_STRLEN",   "T_LEFT_PAR", "T_RIGHT_PAR", "T_DOUBLE_DOT",
-        "T_ASSIGN",   "T_EQL",      "T_GT",        "T_GTE",
-        "T_LT",       "T_LTE",      "T_NEQL",      "T_COMMA",
-        "T_ID",       "T_INT",      "T_DOUBLE",    "T_STRING",
-        "T_K_DO",     "T_K_ELSE",   "T_K_END",     "T_K_FUNCTION",
-        "T_K_GLOBAL", "T_K_IF",     "T_K_INTEGER", "T_K_LOCAL",
-        "T_K_NIL",    "T_K_NUMBER", "T_K_REQUIRE", "T_K_RETURN",
-        "T_K_STRING", "T_K_THEN",   "T_K_WHILE"};
+        "T_OTHER",      "T_EOL",      "T_EOF",       "T_SUB",
+        "T_ADD",        "T_MUL",      "T_DIV",       "T_IDIV",
+        "T_STRLEN",     "T_LEFT_PAR", "T_RIGHT_PAR", "T_DOUBLE_DOT",
+        "T_ASSIGN",     "T_EQL",      "T_GT",        "T_GTE",
+        "T_LT",         "T_LTE",      "T_NEQL",      "T_CONCAT",
+        "T_COMMA",      "T_ID",       "T_INT",       "T_DOUBLE",
+        "T_STRING",     "T_K_DO",     "T_K_ELSE",    "T_K_END",
+        "T_K_FUNCTION", "T_K_GLOBAL", "T_K_IF",      "T_K_INTEGER",
+        "T_K_LOCAL",    "T_K_NIL",    "T_K_NUMBER",  "T_K_REQUIRE",
+        "T_K_RETURN",   "T_K_STRING", "T_K_THEN",    "T_K_WHILE"};
 
     fprintf(
         stdout,
@@ -194,12 +195,12 @@ int lex_fsm(token_ptr *token) {
         nstate = S_ASSIGN;
       else if (current == '>')
         nstate = S_GT;
+      else if (current == '.')
+        nstate = S_DOT0;
       else if (current == '<')
         nstate = S_LT;
       else if (current == ',')
         nstate = S_COMMA;
-      else if (current == '.')
-        nstate = S_DOT0;
       else if (current == '_' || isalpha(current))
         nstate = S_ID;
       else if (current == '~')
@@ -473,13 +474,13 @@ int lex_fsm(token_ptr *token) {
 
     case S_DOT0:
       if (current == '.')
-        nstate = S_DOUBLE_DOT;
+        nstate = S_DOT1;
       else
         nstate = S_ERR;
       break;
 
     case S_DOT1:
-      (*token)->type = T_DOUBLE_DOT;
+      (*token)->type = T_CONCAT;
       break;
 
     case S_TILDA:
