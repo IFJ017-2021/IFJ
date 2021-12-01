@@ -32,6 +32,8 @@ RETURN_LIST    	        ->          function_id(ENTRY_LIST_PARAMS) RETURN_VALUE_
 RETURN_LIST             ->          value_id RETURN_VALUE_NEXT
 RETURN_LIST             ->          expression RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          , value_id RETURN_VALUE_NEXT
+RETURN_VALUE_NEXT       ->          , expression RETURN_VALUE_NEXT
+RETURN_VALUE_NEXT       ->          , function_id(ENTRY_LIST_PARAMS) RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          ε
 STATE_ELSE        	    ->          else STATEMENT
 STATE_ELSE        	    ->          ε
