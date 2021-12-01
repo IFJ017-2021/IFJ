@@ -1,19 +1,23 @@
--- Program 1: Vypocet faktorialu (iterativne)
 require "ifj21"
-function main() -- uzivatelska funkce bez parametru
-  if ((a) < 0) then
-    write("a je nil\n") return
-  else
-  end
-  if (a < 0(a1)) then
-    write("Faktorial nelze spocitat\n")
-  else
-    vysl = 1
-    while a > 0 do
-      vysl = vysl * a a = a - 1 -- dva prikazy
-    end
-    write("Vysledek je: ", vysl, "\n")
-  end
+
+function foo(x : integer, y : integer) : integer, integer
+  local i : integer = x
+  local j : integer = (y + 2) * 3
+  i, j = j+1, i+1  -- vyhodnocuj zprava a přiřazuj později
+  return i, j 
 end
 
-main() -- prikaz hlavniho tela programu
+function main() 
+  local a : integer = 1
+  local b : integer = 2
+  a, b = foo(a, b)  -- returns 13, 2
+  if a < b then
+    write(a, "<", b, "\n")
+  else
+    write(a, ">=", b, "\n")
+    local a : integer = 666  -- Teal varuje, ze redefinice (prekryti)
+    write(a, "\n")
+  end
+  write(a, "\n")  --[[ prints 13 ]]
+end
+main()

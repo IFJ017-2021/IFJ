@@ -42,6 +42,7 @@
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
     && (token->next->type != T_CONCAT)                                          \
+    && (token->next->type != T_RIGHT_PAR)                                       \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
@@ -50,6 +51,7 @@
         token_ptr tmp = (token_ptr) malloc(sizeof (struct token));              \
         tmp->type = token->type;                                                \
         tmp->data = token->data;
+
 DLList token_list;
 token_ptr token;
 
