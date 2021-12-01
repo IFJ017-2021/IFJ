@@ -6,14 +6,14 @@
  *  @author <xhajek51> Vojtěch Hájek
  */
 #include "error.h"
-#include "str.h"
+#include "tokenList.h"
 #include <stdio.h>
 #include <stdlib.h>
 
-void err_call(int error) {
+void err_call(int error, token_ptr token) {
     switch (error) {
         case ERR_LEX:
-            fprintf(stderr, "ERR 1 - Lexical error\n");
+            fprintf(stderr, "ERR 1 - Lexical error");
             break;
         case ERR_SYNTAX:
             fprintf(stderr, "ERR 2 - Syntax error");
@@ -42,6 +42,10 @@ void err_call(int error) {
         case ERR_INTERNAL:
             fprintf(stderr, "ERR 99 - Internal compiler error");
             break;
+    }
+    if (token != NULL)
+    {
+        fprintf(stderr, " on line %d, near the colum %d\n", token->line_num, token->col_num);
     }
     exit(error);
 }

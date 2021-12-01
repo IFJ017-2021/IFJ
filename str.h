@@ -7,12 +7,16 @@
  */
 
 
+#ifndef STRING_H
+#define STRING_H
+
+
 /**
  * @brief string structure
  */
 
 typedef struct{
-    char *data;    // Var to store the string
+    char* data;    // Var to store the string
     int length;   // String lenght
     int capacity; // Memory allocated
 } string;
@@ -28,3 +32,5 @@ int strCompareConstant(string *s1, char *s2);
 char *strGetString(string *s);
 int strGetLength(string *s);
 int strGetCapacity(string *s);
+
+#endif

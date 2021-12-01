@@ -21,21 +21,25 @@ RETURN_LIST_OF_TYPES	->          : TYPE_VALUE TYPE_NEXT
 TYPE_NEXT	            ->          , TYPE_VALUE TYPE_NEXT
 TYPE_NEXT	            ->          ε
 STATEMENT       	    ->          value_id VALUE_ID_NEXT = INIT_VALUE INIT_VALUE_NEXT STATEMENT
-STATEMENT       	    ->          local value_id : TYPE_VALUE INIT_VALUE STATEMENT
+STATEMENT       	    ->          local value_id : TYPE_VALUE INIT_LOCAL_VALUE STATEMENT
 STATEMENT	            ->          function_id(ENTRY_LIST_PARAMS) STATEMENT
 STATEMENT        	    ->          if expression then STATEMENT STATE_ELSE end STATEMENT
 STATEMENT	            ->          return RETURN_LIST STATEMENT
 STATEMENT	            ->          while expression do STATEMENT end STATEMENT
 STATEMENT	            ->          ε
 RETURN_LIST    	        ->          ε
-RETURN_LIST    	        ->          function_id(ENTRY_LIST_PARAMS)
+RETURN_LIST    	        ->          function_id(ENTRY_LIST_PARAMS) RETURN_VALUE_NEXT
 RETURN_LIST             ->          value_id RETURN_VALUE_NEXT
+RETURN_LIST             ->          expression RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          , value_id RETURN_VALUE_NEXT
+RETURN_VALUE_NEXT       ->          , expression RETURN_VALUE_NEXT
+RETURN_VALUE_NEXT       ->          , function_id(ENTRY_LIST_PARAMS) RETURN_VALUE_NEXT
 RETURN_VALUE_NEXT	    ->          ε
 STATE_ELSE        	    ->          else STATEMENT
 STATE_ELSE        	    ->          ε
 INIT_VALUE	            ->          expression
 INIT_VALUE	            ->          function_id(ENTRY_LIST_PARAMS)
+INIT_VALUE	            ->          value_id
 INIT_VALUE_NEXT	        ->          ε
 INIT_VALUE_NEXT	        ->          , INIT_VALUE INIT_VALUE_NEXT
 INIT_LOCAL_VALUE        ->          ε

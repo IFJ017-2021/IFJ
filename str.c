@@ -1,5 +1,5 @@
 /**
- *  @file str.h
+ *  @file str.c
  *
  *  @brief Library that enables working with dynamic strings
  *
@@ -25,7 +25,7 @@ int strInit(string *s){
         s->length = 0;
         s->capacity = STR_LEN_INC;
         return STR_OK;
-    }else if(s->data == NULL){ // String allocation FAILED
+    }else{ // String allocation FAILED
         return STR_ERR;
     }
 }
@@ -40,9 +40,9 @@ void strFree(string *s){
 /**
  * @brief deleting (clearing) whole string
  */
-void strClear(string *s){
-    s->data[0] = '\0';
-    s->length = 0;
+void strClear(string *s) {
+  s->data[0] = '\0';
+  s->length = 0;
 }
 
 /**
@@ -82,7 +82,6 @@ int strCopyString(string *s1, string *s2){
     s1->length = s2->length;
     return STR_OK;
 }
-
 
 /**
  * @brief copy constant 'c' to 's1'
@@ -135,12 +134,3 @@ int strGetLength(string *s){
 int strGetCapacity(string *s){
     return s->capacity;
 }
-
-
-
-
-
-
-
-
-
