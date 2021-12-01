@@ -27,7 +27,7 @@ int main(int argc, char *argv[]) {
     return ERR_INTERNAL;
   }
 
-  token_ptr *token_list;
+  token_ptr *token_list = malloc(sizeof(struct token));
 
   int lex_return = get_token_list(token_list);
 

@@ -26,5 +26,5 @@ int strCopyConstant(string *s1, char *c);
 int strCompareString(string *s1, string *s2);
 int strCompareConstant(string *s1, char *s2);
 char *strGetString(string *s);
-char strGetLenght(string *s);
-char strGetCapacity(string *s);
+int strGetLength(string *s);
+int strGetCapacity(string *s);
