@@ -8,6 +8,7 @@
  */
 #include <stdio.h>
 #include <stdlib.h>
+#include "str.h"
 
 /**
  * @brief Enum of all IFJ21 keywords.
@@ -58,18 +59,18 @@ typedef enum {
 /**
  * @brief Union of different possible term values.
  */
-typedef union tok_data {
-    char *string; // change to our type string as in showcase
+typedef struct token_data {
+    string *string;
     int integer;
     double number;
-} *token_data;
+} *token_data_ptr;
 
 /**
  * @brief Token pointer struct.
  */
 typedef struct token {
     token_type type;
-    token_data data;
+    token_data_ptr data;
     unsigned int line_num;
     unsigned int col_num;
     struct token *prev;

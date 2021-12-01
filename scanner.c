@@ -8,7 +8,6 @@
 
 #include "scanner.h"
 #include "error.h"
-#include "str.h"
 #include <ctype.h>
 #include <malloc.h>
 #include <stdint.h>
@@ -22,7 +21,7 @@ int get_token_list(DLList *list) {
     token_ptr new;
     int error = get_single_token(&new);
     if (error) {
-        // TODO destroy list
+      // TODO destroy list
       return ERR_LEX;
     }
     DLL_InsertLast(list, new);
@@ -99,22 +98,26 @@ bool is_token_keyword(token_ptr *token) {
   return false;
 }
 
-void print_token_list(token_ptr first) {
-  if (first == NULL) {
+void print_token_list(DLList *list) {
+  token_ptr *index = NULL;
+  DLL_First(list);
+  DLL_GetFirst(list, index);
+
+  if (index == NULL) {
     fprintf(stdout, "Token list is empty.");
     return;
   }
 
-  token_ptr index = first->next;
-
-  print_single_token(first);
+  print_single_token(*index);
 
   while (index != NULL) {
-    print_single_token(index);
-    if (index->next == NULL)
+    print_single_token(*index);
+    if ((*index)->next == NULL)
       break;
-    else
-      index = index->next;
+    else {
+      DLL_Next(list);
+      DLL_GetValue(list, index);
+    }
   }
 }
 

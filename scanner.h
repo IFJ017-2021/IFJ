@@ -10,7 +10,6 @@
 #include <stdbool.h>
 #include <stdlib.h>
 #include "tokenList.h"
-#include "str.h"
 
 #define str(x) #x
 #define xstr(x) str(x)
@@ -122,7 +121,7 @@ bool is_token_keyword(token_ptr *token);
  * 
  * @param first 
  */
-void print_token_list(token_ptr first);
+void print_token_list(DLList *list);
 
 /**
  * @brief Print a single token to stdout. 
