@@ -55,6 +55,7 @@ int get_single_token(token_ptr *insert_into) {
   if ((*insert_into)->type == T_ID)
     is_token_keyword(insert_into);
 
+  print_single_token(*insert_into);
   return 0;
 }
 
@@ -92,7 +93,7 @@ bool is_token_keyword(token_ptr *token) {
     (*token)->type = T_K_WHILE;
 
   if ((*token)->type != T_ID) {
-    strFree((*token)->data->string);
+    strClear((*token)->data->string);
   }
 
   return false;
@@ -190,13 +191,15 @@ int lex_fsm(token_ptr *token) {
       else if (current == ':')
         nstate = S_DOUBLE_DOT;
       else if (current == '=')
-        nstate = S_EQL;
+        nstate = S_ASSIGN;
       else if (current == '>')
         nstate = S_GT;
       else if (current == '<')
         nstate = S_LT;
       else if (current == ',')
         nstate = S_COMMA;
+      else if (current == '.')
+        nstate = S_DOT0;
       else if (current == '_' || isalpha(current))
         nstate = S_ID;
       else if (current == '~')
