@@ -18,7 +18,7 @@ int get_token_list(DLList *list) {
   token_ptr new = NULL;
 
   while (new == NULL || new->type != T_EOF) {
-    token_ptr new;
+    new = NULL;
     int error = get_single_token(&new);
     if (error) {
       // TODO destroy list
@@ -99,24 +99,24 @@ bool is_token_keyword(token_ptr *token) {
 }
 
 void print_token_list(DLList *list) {
-  token_ptr *index = NULL;
+  token_ptr index = NULL;
   DLL_First(list);
-  DLL_GetFirst(list, index);
+  DLL_GetFirst(list, &index);
 
   if (index == NULL) {
     fprintf(stdout, "Token list is empty.");
     return;
   }
 
-  print_single_token(*index);
+  print_single_token(index);
 
   while (index != NULL) {
-    print_single_token(*index);
-    if ((*index)->next == NULL)
+    print_single_token(index);
+    if (index->next == NULL)
       break;
     else {
       DLL_Next(list);
-      DLL_GetValue(list, index);
+      DLL_GetValue(list, &index);
     }
   }
 }

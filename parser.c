@@ -17,7 +17,7 @@
 #define GET_TOKEN()                                                            \
   DLL_Next(&token_list);                                                       \
   DLL_GetValue(&token_list, &token);                                           \
-  while (token->type == T_EOL) {                                               \
+  while (token->type == T_EOL || token->type == T_OTHER) {                     \
     DLL_Next(&token_list);                                                     \
     DLL_GetValue(&token_list, &token);                                         \
   }
