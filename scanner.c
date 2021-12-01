@@ -8,8 +8,8 @@
 
 #include "scanner.h"
 #include "error.h"
-#include "str.h"
 #include <ctype.h>
+#include <malloc.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,12 +25,11 @@ int get_token_list(token_ptr *first) {
       *first = new;
     } else {
       prev->next = new;
-      new->prev = prev;
-      prev = new;
     }
+    new->prev = prev;
+    prev = new;
 
     if (error) {
-      // TODO destroy list
       return ERR_LEX;
     }
   }
@@ -45,44 +44,134 @@ int get_single_token(token_ptr *insert_into) {
     return ERR_INTERNAL;
   }
 
-  (*insert_into)->data->string = NULL;
+  (*insert_into)->data = malloc(sizeof(struct token_data));
+
+  if ((*insert_into)->data == NULL) {
+    return ERR_INTERNAL;
+  }
+
+  (*insert_into)->data->string = malloc(sizeof(string));
+  (*insert_into)->data->integer = 0;
+  (*insert_into)->data->number = 0.0;
   (*insert_into)->next = NULL;
   (*insert_into)->prev = NULL;
 
-  lex_fsm(insert_into);
+  if (lex_fsm(insert_into) == ERR_LEX)
+    return ERR_LEX;
 
-  is_token_keyword(insert_into);
+  if ((*insert_into)->type == T_ID)
+    is_token_keyword(insert_into);
 
   return 0;
-};
+}
 
-bool is_token_keyword(token_ptr *token);
+bool is_token_keyword(token_ptr *token) {
+  string *potential_keyword = (*token)->data->string;
+  if (!strCompareConstant(potential_keyword, "do"))
+    (*token)->type = T_K_DO;
+  else if (!strCompareConstant(potential_keyword, "else"))
+    (*token)->type = T_K_ELSE;
+  else if (!strCompareConstant(potential_keyword, "end"))
+    (*token)->type = T_K_END;
+  else if (!strCompareConstant(potential_keyword, "function"))
+    (*token)->type = T_K_FUNCTION;
+  else if (!strCompareConstant(potential_keyword, "global"))
+    (*token)->type = T_K_GLOBAL;
+  else if (!strCompareConstant(potential_keyword, "if"))
+    (*token)->type = T_K_IF;
+  else if (!strCompareConstant(potential_keyword, "integer"))
+    (*token)->type = T_K_INTEGER;
+  else if (!strCompareConstant(potential_keyword, "local"))
+    (*token)->type = T_K_LOCAL;
+  else if (!strCompareConstant(potential_keyword, "nil"))
+    (*token)->type = T_K_NIL;
+  else if (!strCompareConstant(potential_keyword, "number"))
+    (*token)->type = T_K_NUMBER;
+  else if (!strCompareConstant(potential_keyword, "require"))
+    (*token)->type = T_K_REQUIRE;
+  else if (!strCompareConstant(potential_keyword, "return"))
+    (*token)->type = T_K_RETURN;
+  else if (!strCompareConstant(potential_keyword, "string"))
+    (*token)->type = T_K_STRING;
+  else if (!strCompareConstant(potential_keyword, "then"))
+    (*token)->type = T_K_THEN;
+  else if (!strCompareConstant(potential_keyword, "while"))
+    (*token)->type = T_K_WHILE;
 
-void print_token_list(token_ptr first);
+  if ((*token)->type != T_ID) {
+    strFree((*token)->data->string);
+  }
 
-void print_single_token(token_ptr token);
+  return false;
+}
+
+void print_token_list(token_ptr first) {
+  if (first == NULL) {
+    fprintf(stdout, "Token list is empty.");
+    return;
+  }
+
+  token_ptr index = first->next;
+
+  print_single_token(first);
+
+  while (index != NULL) {
+    print_single_token(index);
+    if (index->next == NULL)
+      break;
+    else
+      index = index->next;
+  }
+}
+
+void print_single_token(token_ptr token) {
+  if (token != NULL) {
+    const char *token_type_strings[] = {
+        "T_OTHER",    "T_EOL",      "T_EOF",       "T_SUB",
+        "T_ADD",      "T_MUL",      "T_DIV",       "T_IDIV",
+        "T_STRLEN",   "T_LEFT_PAR", "T_RIGHT_PAR", "T_DOUBLE_DOT",
+        "T_ASSIGN",   "T_EQL",      "T_GT",        "T_GTE",
+        "T_LT",       "T_LTE",      "T_NEQL",      "T_COMMA",
+        "T_ID",       "T_INT",      "T_DOUBLE",    "T_STRING",
+        "T_K_DO",     "T_K_ELSE",   "T_K_END",     "T_K_FUNCTION",
+        "T_K_GLOBAL", "T_K_IF",     "T_K_INTEGER", "T_K_LOCAL",
+        "T_K_NIL",    "T_K_NUMBER", "T_K_REQUIRE", "T_K_RETURN",
+        "T_K_STRING", "T_K_THEN",   "T_K_WHILE"};
+
+    fprintf(
+        stdout,
+        "Next token:\n  Token Type = %s\n  Line number = %d\n  Column number = %d\n  Token data:\n\
+    Token string = %s\n    Token integer = %d\n    Token float = %lf\n\n",
+        token_type_strings[token->type], token->line_num, token->col_num,
+        strGetString(token->data->string), token->data->integer,
+        token->data->number);
+  }
+}
 
 int lex_fsm(token_ptr *token) {
   lexfsm_state pstate = S_START;
   lexfsm_state nstate;
 
   bool fsm_activator = true;
-  static unsigned int line_num = 1;
+  static unsigned int line_num = 0;
   static unsigned int col_num = 1;
 
   static uint8_t escape_code = 0;
 
-  string *read_input;
+  string *read_input = malloc(sizeof(string));
   strInit(read_input);
 
   (*token)->type = T_OTHER;
   (*token)->line_num = line_num;
   (*token)->col_num = col_num;
 
+  static char current = '\n';
+
   while (fsm_activator) {
-    char current = getc(stdin);
-    col_num == 1 ?: col_num++;
-    strAppendChar(read_input, current);
+    /*
+    if (col_num == 1)
+      col_num++;
+    */
     nstate = S_NULL;
 
     switch (pstate) {
@@ -127,6 +216,8 @@ int lex_fsm(token_ptr *token) {
         nstate = S_EOF;
       else if (isspace(current))
         nstate = S_SPACE;
+      else
+        nstate = S_ERR;
 
     case S_SPACE:
       if (current != '\n' && isspace(current))
@@ -257,7 +348,7 @@ int lex_fsm(token_ptr *token) {
         strAppendChar(read_input, current);
         nstate = S_ID;
       } else {
-        (*token)->data->string = strGetString(read_input);
+        (*token)->data->string = read_input;
         (*token)->type = T_ID;
       }
       break;
@@ -308,7 +399,7 @@ int lex_fsm(token_ptr *token) {
       if (isxdigit(current))
         nstate = S_HEX1;
       else {
-        sscanf(strGetString(read_input), "%x", &(*token)->data->integer);
+        sscanf(strGetString(read_input), "%d", &(*token)->data->integer);
         (*token)->type = T_INT;
         break;
       }
@@ -403,7 +494,7 @@ int lex_fsm(token_ptr *token) {
       break;
 
     case S_STR_START:
-      if (current > 31 && current != '\\') {
+      if (current > 31 && current != '\\' && current != '\"') {
         nstate = S_STR_START;
         strAppendChar(read_input, current);
       } else if (current == '\"')
@@ -509,7 +600,7 @@ int lex_fsm(token_ptr *token) {
       break;
 
     case S_STR_FIN:
-      (*token)->data->string = strGetString(read_input);
+      (*token)->data->string = read_input;
       (*token)->type = T_STRING;
       break;
 
@@ -517,17 +608,47 @@ int lex_fsm(token_ptr *token) {
       break;
     }
 
-    if ((*token)->type == T_OTHER || nstate == S_NULL) {
+    if ((*token)->type != T_OTHER || nstate == S_NULL) {
       break;
+    } else if (nstate == S_ERR) {
+      if (pstate != S_START)
+        break;
+      fsm_activator = false;
     }
 
-    if (nstate == S_ID || nstate == S_INT || nstate == S_INT0)
-      strAppendChar(read_input, current);
-    else if (pstate == S_START)
+    if (strGetLength(read_input) == 0) {
+      switch (nstate) {
+      case S_ID:
+      case S_INT:
+      case S_INT0:
+      case S_HEX0:
+      case S_HEX1:
+      case S_FP_DOT:
+      case S_NUMBER:
+      case S_EXP0:
+      case S_EXP1:
+      case S_EXP2:
+      case S_STR_T1:
+      case S_STR_T2:
+      case S_STR_T3:
+      case S_STR_T4:
+      case S_STR_T5:
+      case S_STR_T6:
+      case S_STR_T7:
+      case S_STR_T8:
+      case S_STR_FIN:
+        strAppendChar(read_input, current);
+      default:
+        break;
+      }
+    } else if (pstate == S_START) {
       strClear(read_input);
+    }
 
-    if (current != EOF)
+    if (current != EOF) {
       col_num++;
+      current = getc(stdin);
+    }
 
     pstate = nstate;
   }

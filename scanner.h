@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <stdbool.h>
 #include <stdlib.h>
+#include "str.h"
 
 #define str(x) #x
 #define xstr(x) str(x)
@@ -139,18 +140,18 @@ typedef enum {
 /**
  * @brief Union of different possible term values.  
  */
-typedef union {
-    char *string; // change to our type string as in showcase
+typedef struct token_data {
+    string *string; // change to our type string as in showcase
     int integer;
     double number;
-} *token_data; 
+} *token_data_ptr; 
 
 /**
  * @brief Token pointer struct. 
  */
 typedef struct token {
     token_type type;
-    token_data data;
+    token_data_ptr data;
     unsigned int line_num;
     unsigned int col_num;
     struct token *prev;
