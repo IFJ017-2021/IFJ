@@ -29,8 +29,7 @@
   err_call(ERR_SYNTAX, token)
 
 #define  IS_EXPRESSION()                                                        \
-    if((token->next->type != T_ASSIGN)                                          \
-    && (token->next->type != T_EQL)                                             \
+    if((token->next->type != T_EQL)                                             \
     && (token->next->type != T_GT)                                              \
     && (token->next->type != T_GTE)                                             \
     && (token->next->type != T_LT)                                              \
@@ -213,16 +212,13 @@ void statement() {
     while (token->type != T_K_THEN && token->type != T_EOF){
         INIT_TOKEN_POINTER()
         DLL_InsertLast(&expression_list_if, tmp);
-        //DLL_Delete(&token_list)
         if(token->type == T_LEFT_PAR){
             GET_TOKEN()
-
             expression_par_tmp(&expression_list_if);
         }
         GET_TOKEN()
     }
-    //token->data->string->data  = expression(&expression_list_if); "T_ID T_ID T_MUL"
-
+    expression(&expression_list_if);
 
     CHECK_TYPE(T_K_THEN);
 
@@ -251,14 +247,15 @@ void statement() {
     DLL_Init(&expression_list_while);
     while (token->type != T_K_DO && token->type != T_EOF){
         INIT_TOKEN_POINTER()
-        DLL_InsertLast(&expression_list_if, tmp);
+        DLL_InsertLast(&expression_list_while, tmp);
         if(token->type == T_LEFT_PAR){
             GET_TOKEN()
-            expression_par_tmp(&expression_list_if);
+            expression_par_tmp(&expression_list_while);
         }
         GET_TOKEN()
     }
-    //expression(&expression_list_while);
+    expression(&expression_list_while);
+
     CHECK_TYPE(T_K_DO);
 
     GET_TOKEN()
@@ -320,7 +317,6 @@ void entry_list_params(){
 }
 void entry_param() {
     if((token->type == T_ID)
-       && (token->next->type != T_ASSIGN)
        && (token->next->type != T_EQL)
        && (token->next->type != T_GT)
        && (token->next->type != T_GTE)
@@ -346,13 +342,14 @@ void entry_param() {
                 expression_par_tmp(&expression_list);
             }
             if((token->type == T_ID) || (token->type == T_INT)
-            || (token->type == T_DOUBLE) || (token->type == T_STRING)){
+            || (token->type == T_DOUBLE) || (token->type == T_STRING)
+            || (token->type == T_RIGHT_PAR)){
                 IS_EXPRESSION()
             } else{
                 GET_TOKEN()
             }
         }
-        //expression(&expression_list);
+        expression(&expression_list);
     }
 }
 
@@ -406,7 +403,6 @@ void return_list() {
   || token->type == T_INT || token->type == T_DOUBLE
   || token->type == T_STRLEN || token->type == T_LEFT_PAR) {
       if((token->type == T_ID)
-         && (token->next->type != T_ASSIGN)
          && (token->next->type != T_EQL)
          && (token->next->type != T_GT)
          && (token->next->type != T_GTE)
@@ -444,13 +440,14 @@ void return_list() {
                   expression_par_tmp(&expression_list);
               }
               if((token->type == T_ID) || (token->type == T_INT)
-                 || (token->type == T_DOUBLE) || (token->type == T_STRING)){
+              || (token->type == T_DOUBLE) || (token->type == T_STRING)
+              || (token->type == T_RIGHT_PAR)){
                   IS_EXPRESSION()
               } else{
                   GET_TOKEN()
               }
           }
-          //expression(&expression_list);
+          expression(&expression_list);
           GET_TOKEN()
           return_value_next();
       }
@@ -460,8 +457,8 @@ void return_list() {
 }
 void return_value_next() {
   if (token->type == T_COMMA) {
+      GET_TOKEN()
       if((token->type == T_ID)
-         && (token->next->type != T_ASSIGN)
          && (token->next->type != T_EQL)
          && (token->next->type != T_GT)
          && (token->next->type != T_GTE)
@@ -475,8 +472,10 @@ void return_value_next() {
          && (token->next->type != T_IDIV)
          && (token->next->type != T_STRLEN)
          && (token->next->type != T_CONCAT)){
-          GET_TOKEN()
-          if (token->type == T_LEFT_PAR) {
+          if (token->next->type == T_LEFT_PAR) {
+              GET_TOKEN()
+              CHECK_TYPE(T_LEFT_PAR);
+
               GET_TOKEN()
               entry_list_params();
 
@@ -500,13 +499,14 @@ void return_value_next() {
                   expression_par_tmp(&expression_list);
               }
               if((token->type == T_ID) || (token->type == T_INT)
-              || (token->type == T_DOUBLE) || (token->type == T_STRING)){
+              || (token->type == T_DOUBLE) || (token->type == T_STRING)
+              || (token->type == T_RIGHT_PAR)){
                   IS_EXPRESSION()
               } else{
                   GET_TOKEN()
               }
           }
-          //expression(&expression_list);
+          expression(&expression_list);
           GET_TOKEN()
           return_value_next();
       }
@@ -527,7 +527,6 @@ void init_value() {
   ||(token->type == T_DOUBLE) || (token->type == T_STRING)
   || (token->type == T_STRLEN)|| token->type == T_LEFT_PAR) {
     if((token->type == T_ID)
-    && (token->next->type != T_ASSIGN)
     && (token->next->type != T_EQL)
     && (token->next->type != T_GT)
     && (token->next->type != T_GTE)
@@ -562,7 +561,8 @@ void init_value() {
                 expression_par_tmp(&expression_list);
             }
             if((token->type == T_ID) || (token->type == T_INT)
-               || (token->type == T_DOUBLE) || (token->type == T_STRING)){
+               || (token->type == T_DOUBLE) || (token->type == T_STRING)
+               || (token->type == T_RIGHT_PAR)){
                 IS_EXPRESSION()
             } else{
                 GET_TOKEN()

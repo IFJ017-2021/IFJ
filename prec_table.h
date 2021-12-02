@@ -46,6 +46,25 @@ typedef enum{
     END_DOLLAR      // $
 } prec_table_symbols;
 
+typedef enum{
+    R_ADD,         // E -> E + E
+    R_SUB,        // E-> E - E
+    R_MUL,          // E -> E * E
+    R_DIV,          // E -> E / E
+    R_IDIV,         // E -> E // E
+    R_LT,         // E -> E < E
+    R_GT,         // E -> E > E
+    R_LTE,          // E -> E <= E
+    R_GTE,          // E -> E >= E
+    R_NEQL,       // E -> E ~= E
+    R_EQL,          // E -> E == E
+    R_PARS,      // E -> (E)
+    R_ID,           // E -> i
+    R_STRLEN,       // E -> #E
+    R_CONCAT,        // E -> E .. E
+    R_NOTDEFINED    // NONDEFINED RULE
+} prec_parsing_rules;
+
 void expression(DLList *list);
 int number_in_table(token_ptr token_table);
 #endif
