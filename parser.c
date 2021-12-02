@@ -12,6 +12,7 @@
 #include "symtable.h"
 #include "tokenList.h"
 #include "scanner.h"
+#include "prec_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -25,15 +26,13 @@
     err_call(ERR_SYNTAX, token);                                               \
   }                                                                            \
 
-
 #define IS_TYPE_VALUE()                                                         \
   if ((token->type != T_K_NUMBER) && (token->type != T_K_INTEGER) &&            \
       (token->type != T_K_STRING) && (token->type != T_K_NIL))                  \
   err_call(ERR_SYNTAX, token)
 
 #define  IS_EXPRESSION()                                                        \
-    if((token->next->type != T_ASSIGN)                                          \
-    && (token->next->type != T_EQL)                                             \
+    if((token->next->type != T_EQL)                                             \
     && (token->next->type != T_GT)                                              \
     && (token->next->type != T_GTE)                                             \
     && (token->next->type != T_LT)                                              \
@@ -46,12 +45,10 @@
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
     && (token->next->type != T_CONCAT)                                          \
-    && (token->next->type != T_RIGHT_PAR)                                       \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
     }
-
 #define INIT_TOKEN_POINTER()                                                    \
         token_ptr tmp = (token_ptr) malloc(sizeof(struct token));              \
         tmp->type = token->type;                                                \
@@ -120,7 +117,6 @@ DLList token_list;
 token_ptr token;
 functionPtrData functionData;
 
-void check_function_data();
 
 void start(DLList *testlist) {
     // Insert into global frame built-in functions
@@ -154,7 +150,7 @@ void main_list() {
     token_ptr token_ID;
     switch (token->type) {
         case T_K_FUNCTION:
-            GET_TOKEN()
+        GET_TOKEN()
             CHECK_TYPE(T_ID);
 
             token_ID = token;
@@ -184,11 +180,8 @@ void main_list() {
             GET_TOKEN()
             CHECK_TYPE(T_K_END);
 
-            if (isDefined){
-                CHECK_COUNT_AND_TYPES_OF_PARAMS()
-                CHECK_COUNT_AND_TYPES_OF_RETURN_PARAMS()
-            }
-            else{
+            if (isDefined) { CHECK_COUNT_AND_TYPES_OF_PARAMS()CHECK_COUNT_AND_TYPES_OF_RETURN_PARAMS()
+            } else {
                 global_bst_insert(&bst_tree_of_functions, functionData->key, functionData);
             }
 
@@ -209,15 +202,15 @@ void main_list() {
             CHECK_TYPE(T_RIGHT_PAR);
 
             // TODO zkontrolovat typy jednotlivých ID
-            if(functionData->numOfParams != tmpData->numOfParams){
-                err_call(ERR_SMNTIC_NUMBER_OF_PARAMS,token_ID);
+            if (functionData->numOfParams != tmpData->numOfParams) {
+                err_call(ERR_SMNTIC_NUMBER_OF_PARAMS, token_ID);
             }
 
             GET_TOKEN()
             main_next();
             break;
         case T_K_GLOBAL:
-            GET_TOKEN()
+        GET_TOKEN()
             CHECK_TYPE(T_ID);
 
             if (global_bst_search(bst_tree_of_functions, token->data->string->data, &tmpData) == true) {
@@ -289,7 +282,6 @@ void statement() {
                 GET_TOKEN()
                 statement();
             } else {
-                GET_TOKEN()
                 value_id_next();
 
                 GET_TOKEN()
@@ -334,8 +326,7 @@ void statement() {
                 }
                 GET_TOKEN()
             }
-            //expression(&expression_list_if);
-
+            expression(&expression_list_if);
 
             CHECK_TYPE(T_K_THEN);
 
@@ -364,14 +355,15 @@ void statement() {
             DLL_Init(&expression_list_while);
             while (token->type != T_K_DO && token->type != T_EOF) {
                 INIT_TOKEN_POINTER()
-                DLL_InsertLast(&expression_list_if, tmp);
+                DLL_InsertLast(&expression_list_while, tmp);
                 if (token->type == T_LEFT_PAR) {
                     GET_TOKEN()
-                    expression_par_tmp(&expression_list_if);
+                    expression_par_tmp(&expression_list_while);
                 }
                 GET_TOKEN()
             }
-            //expression(&expression_list_while);
+            expression(&expression_list_while);
+
             CHECK_TYPE(T_K_DO);
 
             GET_TOKEN()
@@ -425,7 +417,6 @@ void entry_list_params() {
 
 void entry_param() {
     if ((token->type == T_ID)
-        && (token->next->type != T_ASSIGN)
         && (token->next->type != T_EQL)
         && (token->next->type != T_GT)
         && (token->next->type != T_GTE)
@@ -450,16 +441,18 @@ void entry_param() {
             INIT_TOKEN_POINTER()
             DLL_InsertLast(&expression_list, tmp);
             if (token->type == T_LEFT_PAR) {
+                GET_TOKEN()
                 expression_par_tmp(&expression_list);
             }
             if ((token->type == T_ID) || (token->type == T_INT)
-                || (token->type == T_DOUBLE) || (token->type == T_STRING)) {
+                || (token->type == T_DOUBLE) || (token->type == T_STRING)
+                || (token->type == T_RIGHT_PAR)) {
                 IS_EXPRESSION()
             } else {
                 GET_TOKEN()
             }
         }
-        //expression(&expression_list);
+        expression(&expression_list);
     }
 }
 
@@ -519,7 +512,6 @@ void return_list() {
         || token->type == T_INT || token->type == T_DOUBLE
         || token->type == T_STRLEN || token->type == T_LEFT_PAR) {
         if ((token->type == T_ID)
-            && (token->next->type != T_ASSIGN)
             && (token->next->type != T_EQL)
             && (token->next->type != T_GT)
             && (token->next->type != T_GTE)
@@ -553,16 +545,18 @@ void return_list() {
                 INIT_TOKEN_POINTER()
                 DLL_InsertLast(&expression_list, tmp);
                 if (token->type == T_LEFT_PAR) {
+                    GET_TOKEN()
                     expression_par_tmp(&expression_list);
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
-                    || (token->type == T_DOUBLE) || (token->type == T_STRING)) {
+                    || (token->type == T_DOUBLE) || (token->type == T_STRING)
+                    || (token->type == T_RIGHT_PAR)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
                 }
             }
-            //expression(&expression_list);
+            expression(&expression_list);
             GET_TOKEN()
             return_value_next();
         }
@@ -573,8 +567,8 @@ void return_list() {
 
 void return_value_next() {
     if (token->type == T_COMMA) {
+        GET_TOKEN()
         if ((token->type == T_ID)
-            && (token->next->type != T_ASSIGN)
             && (token->next->type != T_EQL)
             && (token->next->type != T_GT)
             && (token->next->type != T_GTE)
@@ -588,8 +582,10 @@ void return_value_next() {
             && (token->next->type != T_IDIV)
             && (token->next->type != T_STRLEN)
             && (token->next->type != T_CONCAT)) {
-            GET_TOKEN()
-            if (token->type == T_LEFT_PAR) {
+            if (token->next->type == T_LEFT_PAR) {
+                GET_TOKEN()
+                CHECK_TYPE(T_LEFT_PAR);
+
                 GET_TOKEN()
                 entry_list_params();
 
@@ -609,16 +605,18 @@ void return_value_next() {
                 INIT_TOKEN_POINTER()
                 DLL_InsertLast(&expression_list, tmp);
                 if (token->type == T_LEFT_PAR) {
+                    GET_TOKEN()
                     expression_par_tmp(&expression_list);
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
-                    || (token->type == T_DOUBLE) || (token->type == T_STRING)) {
+                    || (token->type == T_DOUBLE) || (token->type == T_STRING)
+                    || (token->type == T_RIGHT_PAR)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
                 }
             }
-            //expression(&expression_list);
+            expression(&expression_list);
             GET_TOKEN()
             return_value_next();
         }
@@ -641,7 +639,6 @@ void init_value() {
         || (token->type == T_DOUBLE) || (token->type == T_STRING)
         || (token->type == T_STRLEN) || token->type == T_LEFT_PAR) {
         if ((token->type == T_ID)
-            && (token->next->type != T_ASSIGN)
             && (token->next->type != T_EQL)
             && (token->next->type != T_GT)
             && (token->next->type != T_GTE)
@@ -672,16 +669,18 @@ void init_value() {
                 INIT_TOKEN_POINTER()
                 DLL_InsertLast(&expression_list, tmp);
                 if (token->type == T_LEFT_PAR) {
+                    GET_TOKEN()
                     expression_par_tmp(&expression_list);
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
-                    || (token->type == T_DOUBLE) || (token->type == T_STRING)) {
+                    || (token->type == T_DOUBLE) || (token->type == T_STRING)
+                    || (token->type == T_RIGHT_PAR)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
                 }
             }
-            //expression(&expression_list);
+            expression(&expression_list);
         }
     } else {
         DLL_Previous(&token_list);

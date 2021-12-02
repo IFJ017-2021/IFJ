@@ -59,6 +59,10 @@ typedef enum {
     T_K_STRING,
     T_K_THEN,
     T_K_WHILE,
+
+    //prec tokens
+    T_P_DOLLAR,
+    T_P_E
 } token_type;
 
 /**
