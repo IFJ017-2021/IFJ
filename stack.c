@@ -7,7 +7,6 @@
  */
 
 #include "stack.h"
-#include "tokenList.h"
 #include "error.h"
 
 int STACK_SIZE = MAX_STACK;
@@ -23,19 +22,19 @@ void Stack_Init( Stack *stack ) {
 }
 /* Stack_Init */
 
-int Stack_IsEmpty( const Stack *stack ) {
+int Stack_IsEmpty( Stack *stack ) {
 
     return (stack->topIndex == -1);
 }
 /* Stack_IsEmpty */
 
-int Stack_IsFull( const Stack *stack ) {
+int Stack_IsFull( Stack *stack ) {
 
     return (stack->topIndex == STACK_SIZE-1);
 }
 /* Stack_IsFull */
 
-void Stack_Top( const Stack *stack, token_ptr *dataPtr ) {
+void Stack_Top( Stack *stack, token_ptr *dataPtr ) {
 
     if(!Stack_IsEmpty(stack)){
         *dataPtr = stack->array[stack->topIndex];
