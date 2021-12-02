@@ -16,7 +16,7 @@
 
 int precedence_table[TABLE_SIZE][TABLE_SIZE] =
 {
-//         |+ |-| *| /|//| <| >|<=|>=|~=|==| (| )| i| #|..| $|
+//         |+ |-| *| /|//| <| >|<=|>=|~=|==| (| )| i| #|..| $|  INPUT
 /* + */    {R, R, S, S, S, R, R, R, R, R, R, S, R, S, S, R, R},
 /* - */    {R, R, S, S, S, R, R, R, R, R, R, S, R, S, S, R, R},
 /* * */    {R, R, R, R, R, R, R, R, R, R, R, S, R, S, S, R, R},
@@ -34,6 +34,7 @@ int precedence_table[TABLE_SIZE][TABLE_SIZE] =
 /* # */    {R, R, R, R, R, R, R, R, R, R, R, S, R, S, S, R, R},
 /* ..*/    {S, S, S, S, S, R, R, R, R, R, R, S, R, S, S, S, R},
 /* $ */    {S, S, S, S, S, S, S, S, S, S, S, S, X, S, S, S, X},
+//STACK
 };
 
 
@@ -115,6 +116,8 @@ prec_table_symbols get_index_from_char(char character){
         return LENGTH;
     case '..':
         return CONCAT;
+    case '$':
+        return END_DOLLAR;
     default:
         return character;
     }
@@ -147,6 +150,8 @@ char get_symbol_from_index(prec_table_symbols symbol){
         return '#';
     case CONCAT:
         return '..';
+    case END_DOLLAR:
+        return '$';
     default:
         return symbol;
     }
