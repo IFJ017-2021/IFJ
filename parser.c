@@ -10,6 +10,7 @@
 #include "parser.h"
 #include "error.h"
 #include "scanner.h"
+#include "prec_table.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -42,7 +43,6 @@
     && (token->next->type != T_IDIV)                                            \
     && (token->next->type != T_STRLEN)                                          \
     && (token->next->type != T_CONCAT)                                          \
-    && (token->next->type != T_RIGHT_PAR)                                       \
     ){break;}                                                                   \
     else{                                                                       \
         GET_TOKEN()                                                             \
@@ -340,6 +340,7 @@ void entry_param() {
             INIT_TOKEN_POINTER()
             DLL_InsertLast(&expression_list, tmp);
             if(token->type == T_LEFT_PAR){
+                GET_TOKEN()
                 expression_par_tmp(&expression_list);
             }
             if((token->type == T_ID) || (token->type == T_INT)
@@ -437,6 +438,7 @@ void return_list() {
               INIT_TOKEN_POINTER()
               DLL_InsertLast(&expression_list, tmp);
               if(token->type == T_LEFT_PAR){
+                  GET_TOKEN()
                   expression_par_tmp(&expression_list);
               }
               if((token->type == T_ID) || (token->type == T_INT)
@@ -492,6 +494,7 @@ void return_value_next() {
               INIT_TOKEN_POINTER()
               DLL_InsertLast(&expression_list, tmp);
               if(token->type == T_LEFT_PAR){
+                  GET_TOKEN()
                   expression_par_tmp(&expression_list);
               }
               if((token->type == T_ID) || (token->type == T_INT)
@@ -553,6 +556,7 @@ void init_value() {
             INIT_TOKEN_POINTER()
             DLL_InsertLast(&expression_list, tmp);
             if(token->type == T_LEFT_PAR){
+                GET_TOKEN()
                 expression_par_tmp(&expression_list);
             }
             if((token->type == T_ID) || (token->type == T_INT)

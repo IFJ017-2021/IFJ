@@ -5,6 +5,10 @@
  *
  *  @author <xvasin11> Ladislav Vasina
  */
+#ifndef IFJ_PREC_TABLE_H
+#define IFJ_PREC_TABLE_H
+
+#include "tokenList.h"
 
 /**
  * @enum Precedence table symbols
@@ -40,3 +44,7 @@ typedef enum{
     CONCAT,         // ..
     END_DOLLAR      // $
 } prec_table_symbols;
+
+void expression(DLList *list);
+int number_in_table(token_ptr token_table);
+#endif
