@@ -14,6 +14,7 @@
 #include <string.h>
 
 #define TABLE_SIZE 17
+#define EX_TABLE 50
 
 prec_table_actions precedence_table[TABLE_SIZE][TABLE_SIZE] = {
     //      |+ |-| *| /|//| <| >|<=|>=|~=|==| (| )| i| #|..| $|
