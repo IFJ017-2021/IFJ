@@ -14,8 +14,6 @@
 #include <string.h>
 
 #define TABLE_SIZE 17
-#define EX_TABLE 100
-
 
 prec_table_actions precedence_table[TABLE_SIZE][TABLE_SIZE] = {
     //      |+ |-| *| /|//| <| >|<=|>=|~=|==| (| )| i| #|..| $|
@@ -84,7 +82,6 @@ int number_in_table(token_ptr token_table){
             return 16;
         default:
             err_call(ERR_SYNTAX, prec_token);
-            return -1;
     }
 }
 /*
