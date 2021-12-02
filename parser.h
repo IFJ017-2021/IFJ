@@ -10,6 +10,8 @@
 #define parser_H
 
 #include "tokenList.h"
+#include "symtable.h"
+
 /**
  * @brief Implementation START rule. <br>
  *  1) require "ifj21" MAIN_LIST <br>
@@ -103,6 +105,13 @@ void return_list_of_types();
 void type_next();
 
 /**
+ * @brief Implementation of RETURN_TYPE_NEXT rule. <br>
+ * 1) , TYPE_VALUE RETURN_TYPE_NEXT <br>
+ * @param ... ?
+*/
+void return_type_next();
+
+/**
  * @brief Implementation of TYPE_VALUE rule. <br>
  * 1) string <br>
  * 2) number <br>
@@ -169,5 +178,11 @@ void value_id_next();
  * @param list of tokens for expression processing
 */
 void expression_par_tmp(DLList *list);
+
+/**
+ * @brief Insert into global frame built-in functions
+ * @param list of tokens for expression processing
+*/
+void built_in_functions();
 
 #endif

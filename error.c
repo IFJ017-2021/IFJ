@@ -10,6 +10,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+
 void err_call(int error, token_ptr token) {
     switch (error) {
         case ERR_LEX:
@@ -17,9 +18,13 @@ void err_call(int error, token_ptr token) {
             break;
         case ERR_SYNTAX:
             fprintf(stderr, "ERR 2 - Syntax error");
+            if (token != NULL)
+            {
+                fprintf(stderr, " on line %d, near the colum %d\n", token->line_num, token->col_num);
+            }
             break;
         case ERR_SMNTIC_UNDEF:
-            fprintf(stderr, "ERR 3 - Semantic error (indefinite function or variable..)");
+            fprintf(stderr, "ERR 3 - Semantic error (indefinite function or variable..)\n");
             break;
         case ERR_SMNTIC_TYPE:
             fprintf(stderr, "ERR 4 - Semantic error (type incompatibility)");
@@ -42,10 +47,51 @@ void err_call(int error, token_ptr token) {
         case ERR_INTERNAL:
             fprintf(stderr, "ERR 99 - Internal compiler error");
             break;
-    }
-    if (token != NULL)
-    {
-        fprintf(stderr, " on line %d, near the colum %d\n", token->line_num, token->col_num);
+        case ERR_SMNTIC_REDEFINE_F:
+        case ERR_SMNTIC_REDEFINE_V:
+            fprintf(stderr, "ERR 3 - Semantic error (indefinite function or variable..)\n");
+            if (token != NULL)
+            {
+                fprintf(stderr, "Trying to redefine %s %s on line %d, near the colum %d\n", (error == ERR_SMNTIC_REDEFINE_F ? "function" : "value"), token->data->string->data, token->line_num, token->col_num);
+            }
+            error = ERR_SMNTIC_UNDEF;
+            break;
+
+        case ERR_SMNTIC_UNDEFINED_F:
+        case ERR_SMNTIC_UNDEFINED_V:
+            fprintf(stderr, "ERR 3 - Semantic error (indefinite function or variable..)\n");
+            if (token != NULL)
+            {
+                if (error == ERR_SMNTIC_UNDEFINED_F){
+                    fprintf(stderr, "Trying to call undefined function %s on line %d, near the colum %d\n", token->data->string->data, token->line_num, token->col_num);
+                }
+                else{
+                    fprintf(stderr, "Trying to access undefined value %s on line %d, near the colum %d\n", token->data->string->data, token->line_num, token->col_num);
+                }
+            }
+            error = ERR_SMNTIC_UNDEF;
+            break;
+
+        case ERR_SMNTIC_NUMBER_OF_PARAMS:
+        case ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS:
+            fprintf(stderr, "ERR 5 - Semantic error (wrong number / type of parameters or return values when calling a function or returning from a function\n");
+            if (token != NULL)
+            {
+                fprintf(stderr, "Wrong number of %sparams in function %s on line %d, near the colum %d\n", (error == ERR_SMNTIC_NUMBER_OF_PARAMS ? "" : "return "), token->data->string->data, token->line_num, token->col_num);
+            }
+            error = ERR_SMNTIC_PARAMS;
+            break;
+
+        case ERR_SMNTIC_PARAMS_TYPE:
+        case ERR_SMNTIC_RETURN_PARAMS_TYPE:
+            fprintf(stderr, "ERR 5 - Semantic error (wrong number / type of parameters or return values when calling a function or returning from a function\n");
+            if (token != NULL)
+            {
+                fprintf(stderr, "Wrong types of %sparams in function %s on line %d, near the colum %d\n", (error == ERR_SMNTIC_PARAMS_TYPE ? "" : "return "), token->data->string->data, token->line_num, token->col_num);
+            }
+            error = ERR_SMNTIC_PARAMS;
+            break;
+
     }
     exit(error);
 }

@@ -66,7 +66,7 @@ void global_bst_init(GlobalBSTNodePtr *tree)
     *tree = NULL;
 }
 
-bool global_bst_search(GlobalBSTNodePtr tree, char *key)
+bool global_bst_search(GlobalBSTNodePtr tree, char *key, functionPtrData *data)
 {
     if(tree == NULL)
     {
@@ -75,17 +75,20 @@ bool global_bst_search(GlobalBSTNodePtr tree, char *key)
 
     if(strcmp(tree->key, key) == 0)
     {
+        if(data != NULL){
+            *data = tree->content;
+        }
         return true;
     }
     else
     {
         if(strcmp(tree->key, key) > 0)
         {
-            return global_bst_search(tree->left, key);
+            return global_bst_search(tree->left, key, data);
         }
         else
         {
-            return global_bst_search(tree->right, key);
+            return global_bst_search(tree->right, key, data);
         }
     }
 }
@@ -98,6 +101,7 @@ void global_bst_insert(GlobalBSTNodePtr *tree, char *key, functionPtrData functi
 
         if(*tree != NULL)
         {
+            (*tree)->key = malloc(sizeof(char) * strlen(key));
             strcpy((*tree)->key, key);
             (*tree)->content = function_data;
             (*tree)->left = NULL;
