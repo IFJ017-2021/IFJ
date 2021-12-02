@@ -25,7 +25,7 @@ int get_token_list(DLList *list) {
       // TODO destroy list
       return ERR_LEX;
     }
-    if(new->type != T_OTHER) {
+    if(new->type != T_OTHER && new->type != T_EOL) {
         DLL_InsertLast(list, new);
     }
   }

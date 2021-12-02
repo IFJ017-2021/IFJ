@@ -5,6 +5,10 @@
  *
  *  @author <xvasin11> Ladislav Vasina
  */
+#ifndef IFJ_PREC_TABLE_H
+#define IFJ_PREC_TABLE_H
+
+#include "tokenList.h"
 
 /**
  * @enum Precedence table symbols
@@ -58,3 +62,5 @@ typedef enum{
     R_OP,           // E -> I 12
     R_NOTDEFINED    // NONDEFINED RULE 13
 } prec_parsing_rules;
+
+#endif
