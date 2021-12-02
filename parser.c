@@ -213,13 +213,15 @@ void statement() {
     while (token->type != T_K_THEN && token->type != T_EOF){
         INIT_TOKEN_POINTER()
         DLL_InsertLast(&expression_list_if, tmp);
+        //DLL_Delete(&token_list)
         if(token->type == T_LEFT_PAR){
             GET_TOKEN()
+
             expression_par_tmp(&expression_list_if);
         }
         GET_TOKEN()
     }
-    //expression(&expression_list_if);
+    //token->data->string->data  = expression(&expression_list_if); "T_ID T_ID T_MUL"
 
 
     CHECK_TYPE(T_K_THEN);
@@ -566,7 +568,7 @@ void init_value() {
                 GET_TOKEN()
             }
         }
-        //expression(&expression_list);
+        expression(&expression_list);
     }
   } else {
     DLL_Previous(&token_list);

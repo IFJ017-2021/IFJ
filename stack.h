@@ -43,13 +43,13 @@ void Stack_Pop( Stack *stack );
  * @brief Returns not null value when stack is empty
  * @param list Pointer to the stack struct
  */
-int Stack_IsEmpty( const Stack *stack );
+int Stack_IsEmpty( Stack *stack );
 
 /**
  * @brief Return not null value when stack is full
  * @param list Pointer to the stack struct
  */
-int Stack_IsFull( const Stack *stack );
+int Stack_IsFull( Stack *stack );
 
 /**
  * @brief Adds value to top of the stack
