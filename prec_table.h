@@ -4,12 +4,13 @@
  *  @brief Header file for prec_table.c (File that implements precedence table)
  *
  *  @author <xvasin11> Ladislav Vasina
+ *  @author <xhajek51> Vojtěch Hájek
  */
 #ifndef IFJ_PREC_TABLE_H
 #define IFJ_PREC_TABLE_H
 
 #include "tokenList.h"
-
+#include "stdbool.h"
 
 /**
  * @enum Precedence table symbols
@@ -65,6 +66,6 @@ typedef enum{
     R_NOTDEFINED    // NONDEFINED RULE
 } prec_parsing_rules;
 
-void expression(DLList *list);
-int number_in_table(token_ptr token_table);
+void expression(DLList *list, bool where_expression);
+int number_in_table(token_ptr token_table, bool a);
 #endif

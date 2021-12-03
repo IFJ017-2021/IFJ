@@ -4,6 +4,7 @@
  *  @brief Implementation of precedence table
  *
  *  @author <xvasin11> Ladislav Vasina
+ *  @author <xhajek51> Vojtěch Hájek
  */
 
 #include "prec_table.h"
@@ -40,7 +41,13 @@ prec_table_actions precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 token_ptr prec_token;
 DLList prec_token_list;
 
-int number_in_table(token_ptr token_table){
+int number_in_table(token_ptr token_table, bool a){
+    if(a == 0){
+        if(token_table->type == T_LT || token_table->type == T_GT || token_table->type == T_LTE
+        || token_table->type == T_GTE || token_table->type == T_EQL || token_table->type == T_NEQL){
+            err_call(ERR_SYNTAX, token_table);
+        }
+    }
     switch (token_table->type) {
         case T_ADD:
             return 0;
@@ -72,7 +79,12 @@ int number_in_table(token_ptr token_table){
         case T_ID:
         case T_STRING:
         case T_DOUBLE:
+            return 13;
         case T_K_NIL:
+            if((token_table->prev != NULL && token_table->prev->type != T_EQL && token_table->prev->type != T_NEQL)
+            || (token_table->next != NULL && token_table->next->type != T_EQL && token_table->next->type != T_NEQL )){
+                err_call(ERR_RUN_NILL, token_table);
+            }
             return 13;
         case T_STRLEN:
             return 14;
@@ -81,7 +93,8 @@ int number_in_table(token_ptr token_table){
         case T_P_DOLLAR:
             return 16;
         default:
-            err_call(ERR_SYNTAX, prec_token);
+            err_call(ERR_SYNTAX, token_table);
+            return -1;
     }
 }
 /*
@@ -135,6 +148,10 @@ prec_parsing_rules check_rule(int symbCount, token_ptr *tokens) {
             if (t1->type == T_P_E && t2->type == T_DIV && t3->type == T_P_E) {
                 return R_DIV;
             }
+            // E -> E // E
+            if (t1->type == T_P_E && t2->type == T_IDIV && t3->type == T_P_E) {
+                return R_IDIV;
+            }
             // E -> E == E
             if (t1->type == T_P_E && t2->type == T_EQL && t3->type == T_P_E) {
                 return R_EQL;
@@ -173,7 +190,7 @@ prec_parsing_rules check_rule(int symbCount, token_ptr *tokens) {
     }
 }
 
-void expression(DLList *list){
+void expression(DLList *list, bool where_expression){
     if(list == NULL){
         err_call(ERR_SYNTAX, NULL);
     }
@@ -203,8 +220,8 @@ void expression(DLList *list){
     while (prec_token->type != T_P_DOLLAR || stack->array[stack->topIndex]->type != T_P_DOLLAR ){
         token_ptr tmp;
         Stack_Top(stack, &tmp);
-        int row = number_in_table(tmp);
-        int col = number_in_table(prec_token);
+        int row = number_in_table(tmp, where_expression);
+        int col = number_in_table(prec_token, where_expression);
         prec_table_actions action = precedence_table[row][col];
         switch (action) {
             case R:;
@@ -215,7 +232,6 @@ void expression(DLList *list){
                     Stack_Pop(stack_sym);
                     symbols[num_symbols] = tmp;
                     num_symbols++;
-
                 }
                 while (stack->array[stack->topIndex]->type != T_OTHER ){
                     Stack_Top(stack, &tmp);
@@ -265,7 +281,6 @@ void expression(DLList *list){
                 err_call(ERR_SYNTAX, prec_token);
                 break;
         }
-
     }
     Stack_Pop(stack_sym);
 }
