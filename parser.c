@@ -9,7 +9,7 @@
 
 #include "parser.h"
 #include "error.h"
-#include "symtable.h"
+#include "symtable.c"
 #include "tokenList.h"
 #include "scanner.h"
 #include "prec_table.h"
@@ -420,7 +420,8 @@ void param_next(functionPtrData functionData) {
 void entry_list_params(functionPtrData functionData) {
     if ((token->type == T_ID) || (token->type == T_INT)
         || (token->type == T_DOUBLE) || (token->type == T_STRING)
-        || (token->type == T_STRLEN) || (token->type == T_LEFT_PAR)) {
+        || (token->type == T_STRLEN) || (token->type == T_LEFT_PAR)
+        || token->type == T_K_NIL) {
         entry_param(functionData);
         GET_TOKEN()
         entry_param_next(functionData);
@@ -457,7 +458,7 @@ void entry_param(functionPtrData functionData) {
             }
             if ((token->type == T_ID) || (token->type == T_INT)
                 || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                || (token->type == T_RIGHT_PAR)) {
+                || (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
                 IS_EXPRESSION()
             } else {
                 GET_TOKEN()
@@ -524,7 +525,8 @@ void type_value() { IS_TYPE_VALUE(); }
 void return_list(functionPtrData functionData) {
     if (token->type == T_ID || token->type == T_STRING
         || token->type == T_INT || token->type == T_DOUBLE
-        || token->type == T_STRLEN || token->type == T_LEFT_PAR) {
+        || token->type == T_STRLEN || token->type == T_LEFT_PAR
+        || token->type == T_K_NIL) {
         if ((token->type == T_ID)
             && (token->next->type != T_EQL)
             && (token->next->type != T_GT)
@@ -564,7 +566,7 @@ void return_list(functionPtrData functionData) {
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
                     || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
+                    || (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
@@ -624,7 +626,7 @@ void return_value_next(functionPtrData functionData) {
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
                     || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
+                    || (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
@@ -651,7 +653,8 @@ void state_else() {
 void init_value(functionPtrData functionData) {
     if ((token->type == T_ID) || (token->type == T_INT)
         || (token->type == T_DOUBLE) || (token->type == T_STRING)
-        || (token->type == T_STRLEN) || token->type == T_LEFT_PAR) {
+        || (token->type == T_STRLEN) || token->type == T_LEFT_PAR
+        || token->type == T_K_NIL) {
         if ((token->type == T_ID)
             && (token->next->type != T_EQL)
             && (token->next->type != T_GT)
@@ -700,7 +703,7 @@ void init_value(functionPtrData functionData) {
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
                     || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
+                    || (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()

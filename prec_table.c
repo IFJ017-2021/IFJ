@@ -72,7 +72,12 @@ int number_in_table(token_ptr token_table){
         case T_ID:
         case T_STRING:
         case T_DOUBLE:
+            return 13;
         case T_K_NIL:
+            if((token_table->prev != NULL && token_table->prev->type != T_EQL && token_table->prev->type != T_NEQL)
+            && (token_table->next != NULL && token_table->next->type != T_EQL && token_table->next->type != T_NEQL )){
+                err_call(ERR_RUN_NILL, token_table);
+            }
             return 13;
         case T_STRLEN:
             return 14;
@@ -81,7 +86,8 @@ int number_in_table(token_ptr token_table){
         case T_P_DOLLAR:
             return 16;
         default:
-            err_call(ERR_SYNTAX, prec_token);
+            err_call(ERR_SYNTAX, token_table);
+            return -1;
     }
 }
 /*
@@ -134,6 +140,10 @@ prec_parsing_rules check_rule(int symbCount, token_ptr *tokens) {
             // E -> E / E
             if (t1->type == T_P_E && t2->type == T_DIV && t3->type == T_P_E) {
                 return R_DIV;
+            }
+            // E -> E // E
+            if (t1->type == T_P_E && t2->type == T_IDIV && t3->type == T_P_E) {
+                return R_IDIV;
             }
             // E -> E == E
             if (t1->type == T_P_E && t2->type == T_EQL && t3->type == T_P_E) {
@@ -215,7 +225,6 @@ void expression(DLList *list){
                     Stack_Pop(stack_sym);
                     symbols[num_symbols] = tmp;
                     num_symbols++;
-
                 }
                 while (stack->array[stack->topIndex]->type != T_OTHER ){
                     Stack_Top(stack, &tmp);
@@ -265,7 +274,6 @@ void expression(DLList *list){
                 err_call(ERR_SYNTAX, prec_token);
                 break;
         }
-
     }
     Stack_Pop(stack_sym);
 }
