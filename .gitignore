@@ -50,3 +50,9 @@ modules.order
 Module.symvers
 Mkfile.old
 dkms.conf
+
+.cache/
+.vscode/
+build
+ifj21_examples/
+ifjcode21_examples/
