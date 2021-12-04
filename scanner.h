@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file scanner.h
  *
  *  @brief Header file for scanner.c (Lexical analyzer).

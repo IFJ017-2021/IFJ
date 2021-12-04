@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file error.h
  *
  *  @brief Header file with define exit error codes.

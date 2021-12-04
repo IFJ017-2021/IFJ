@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file prec_table.c
  *
  *  @brief Implementation of precedence table

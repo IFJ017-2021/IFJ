@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file error.c
  *
  *  @brief Implementation of printing error codes
