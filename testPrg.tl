@@ -2,9 +2,9 @@ require "ifj21"
 
 function main()
 
-    local n:nil = a
+    local n:integer = 5 + a
 
-    if x == nil + a then
+    if x == nil then
         write("yes\n")
     else
         write("no\n")
@@ -28,5 +28,4 @@ function main()
         write("no\n")
     end
 end
-
 main()

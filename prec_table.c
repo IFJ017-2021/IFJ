@@ -4,7 +4,6 @@
  *  @brief Implementation of precedence table
  *
  *  @author <xvasin11> Ladislav Vasina
- *  @author <xhajek51> Vojtěch Hájek
  */
 
 #include "prec_table.h"
@@ -232,6 +231,7 @@ void expression(DLList *list, bool where_expression){
                     Stack_Pop(stack_sym);
                     symbols[num_symbols] = tmp;
                     num_symbols++;
+
                 }
                 while (stack->array[stack->topIndex]->type != T_OTHER ){
                     Stack_Top(stack, &tmp);
