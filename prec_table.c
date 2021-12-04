@@ -80,8 +80,8 @@ int number_in_table(token_ptr token_table, bool a){
         case T_DOUBLE:
             return 13;
         case T_K_NIL:
-            if((token_table->prev != NULL && token_table->prev->type != T_EQL && token_table->prev->type != T_NEQL)
-            || (token_table->next != NULL && token_table->next->type != T_EQL && token_table->next->type != T_NEQL )){
+            if((token_table->prev != NULL && token_table->prev->type != T_P_DOLLAR && token_table->prev->type != T_EQL && token_table->prev->type != T_NEQL)
+            || (token_table->next != NULL && token_table->next->type != T_P_DOLLAR && token_table->next->type != T_EQL && token_table->next->type != T_NEQL )){
                 err_call(ERR_RUN_NILL, token_table);
             }
             return 13;
