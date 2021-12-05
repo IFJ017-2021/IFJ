@@ -254,7 +254,7 @@ char *string_postfix(token_ptr string_token){
     }
 }
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
+token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
   }
@@ -266,7 +266,7 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
       prec_token->data->string->data = tmp;
       return prec_token;
   }
-  stack_bst_tree = stackBst;
+  stack_bst_tree = *stackBst;
 
   prec_token_list = *list;
   DLL_First(&prec_token_list);
