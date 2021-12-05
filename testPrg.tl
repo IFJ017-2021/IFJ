@@ -2,9 +2,9 @@ require "ifj21"
 
 function main()
 
-    local n:integer = 5 + a
+    local n:integer = (5 + a) * (5 + b) / 8
 
-    if x == nil then
+    if (x+a) == nil then
         write("yes\n")
     else
         write("no\n")

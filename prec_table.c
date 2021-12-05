@@ -10,7 +10,7 @@
 #include "prec_table.h"
 #include "error.h"
 #include "parser.h"
-#include "stack.h"
+#include "stack.c"
 #include <stdlib.h>
 #include <string.h>
 
@@ -84,7 +84,7 @@ int number_in_table(token_ptr token_table, bool a) {
   case T_K_NIL:
     if ((token_table->prev != NULL && token_table->prev->type != T_P_DOLLAR &&
         token_table->prev->type != T_EQL && token_table->prev->type != T_NEQL) ||
-        (token_table->next != NULL && token_table->prev->type != T_P_DOLLAR &&
+        (token_table->next != NULL && token_table->next->type != T_P_DOLLAR &&
         token_table->next->type != T_EQL && token_table->next->type != T_NEQL)) {
       err_call(ERR_RUN_NILL, token_table);
     }
@@ -197,12 +197,69 @@ prec_parsing_rules check_rule(int symbCount, token_ptr *tokens) {
   }
 }
 
-void expression(DLList *list, bool where_expression) {
+char *string_postfix(token_ptr string_token){
+    char *a;
+    switch (string_token->type) {
+        case T_ID:
+            return string_token->data->string->data;
+        case T_INT:
+            sprintf(a, "%d", string_token->data->integer);
+            return a;
+        case T_STRING:
+            a = string_token->data->string->data;
+            return a;
+        case T_DOUBLE:
+            sprintf(a, "%f", string_token->data->number);
+            return a;
+        case T_K_NIL:
+            return "nil";
+        case T_ADD:
+            return "+";
+        case T_SUB:
+            return "-";
+        case T_MUL:
+            return "*";
+        case T_DIV:
+            return "/";
+        case T_IDIV:
+            return "//";
+        case T_LT:
+            return "<";
+        case T_GT:
+            return ">";
+        case T_LTE:
+            return "<=";
+        case T_GTE:
+            return ">=";
+        case T_NEQL:
+            return "~=";
+        case T_EQL:
+            return "==";
+        case T_LEFT_PAR:
+            return "(";
+        case T_RIGHT_PAR:
+            return ")";
+        case T_STRLEN:
+            return "#";
+        case T_CONCAT:
+            return "..";
+        default:
+            err_call(ERR_INTERNAL, string_token);
+            return a;
+    }
+}
+
+token_ptr expression(DLList *list, bool where_expression) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
   }
   if (list->first->next == NULL) {
-    return;
+      DLL_First(list);
+      DLL_GetFirst(list, &prec_token);
+      char *tmp = string_postfix(prec_token);
+      prec_token->type = T_P_EXPRESSION;
+      prec_token->data->string->data = tmp;
+      return prec_token;
   }
   prec_token_list = *list;
   DLL_First(&prec_token_list);
@@ -292,4 +349,25 @@ void expression(DLList *list, bool where_expression) {
 
     }
     Stack_Token_Pop(stack_sym);
+
+    token_ptr result = (token_ptr) malloc(sizeof (struct token));
+    result->data =  malloc(sizeof(struct token_data));
+    result->data->string =  malloc(sizeof(string));
+    result->data->integer = 0;
+    result->data->number = 0.0;
+    result->type = T_P_EXPRESSION;
+
+    strInit(result->data->string);
+    int i=0;
+    while (i < count){
+        char *tmp = string_postfix(expression_table[i]);
+        if(i != 0){
+            strcat(result->data->string->data, " ");
+        }
+        strcat(result->data->string->data, tmp);
+        expression_table[i] = NULL;
+        i++;
+    }
+    DLL_Dispose(&prec_token_list);
+    return result;
 }

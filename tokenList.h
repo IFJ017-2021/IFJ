@@ -63,6 +63,7 @@ typedef enum {
 
     //prec tokens
     T_P_DOLLAR,
+    T_P_EXPRESSION,
     T_P_E
 } token_type;
 

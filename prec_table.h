@@ -68,6 +68,6 @@ typedef enum{
     R_NOTDEFINED    // NONDEFINED RULE
 } prec_parsing_rules;
 
-void expression(DLList *list, bool where_expression);
+token_ptr expression(DLList *list, bool where_expression);
 int number_in_table(token_ptr token_table, bool a);
 #endif
