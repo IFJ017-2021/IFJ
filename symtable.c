@@ -12,55 +12,89 @@
 #include <stdlib.h>
 #include <string.h>
 
-//void local_bst_init(LocalBSTNodePtr *tree)
-//{
-//    (*tree) = NULL;
-//}
-//
-//void local_bst_insert(LocalBSTNodePtr *tree, char *key, ValueType type)
-//{
-//
-//}
-//
-//bool local_bst_search(LocalBSTNodePtr tree, char *key)
-//{
-//    if(tree == NULL)
-//    {
-//        return false;
-//    }
-//
-//    if(strcmp(tree->key, key))
-//    {
-//        return true;
-//    }
-//    else
-//    {
-//        if(tree->key > key)
-//        {
-//            return bst_search(tree->left, key);
-//        }
-//        else
-//        {
-//            return bst_search(tree->right, key);
-//        }
-//    }
-//}
-//
-//void local_bst_delete(LocalBSTNodePtr *tree, char *key)
-//{
-//    // TODO
-//}
-//
-//void local_bst_dispose(LocalBSTNodePtr *tree)
-//{
-//    if(*tree != NULL)
-//    {
-//        local_bst_dispose(&(*tree)->left);
-//        local_bst_dispose(&(*tree)->right);
-//        free(*tree);
-//    }
-//    (*tree) = NULL;
-//}
+void local_bst_init(LocalBSTNodePtr *tree)
+{
+    (*tree) = NULL;
+}
+
+void local_bst_insert(LocalBSTNodePtr *tree, char *key, token_type type)
+{
+    if((*tree) == NULL)
+    {
+        *tree = (LocalBSTNodePtr) malloc(sizeof(struct LocalBSTNode));
+
+        if(*tree != NULL)
+        {
+            (*tree)->key = malloc(sizeof(char) * strlen(key));
+            strcpy((*tree)->key, key);
+            (*tree)->type = type;
+            (*tree)->left = NULL;
+            (*tree)->right = NULL;
+        }
+
+        return;
+    }
+
+    if(strcmp(key, (*tree)->key) < 0)
+    {
+        local_bst_insert(&(*tree)->left, key, type);
+    }
+    else
+    {
+        if(strcmp((*tree)->key, key) < 0)
+        {
+            local_bst_insert(&(*tree)->right, key, type);
+        }
+        else
+        {
+            (*tree)->type = type;
+        }
+    }
+}
+
+bool local_bst_search(LocalBSTNodePtr tree, char *key, LocalBSTNodePtr *pointer)
+{
+    if(tree == NULL || tree->key == NULL)
+    {
+        return false;
+    }
+
+    if(strcmp(tree->key, key) == 0)
+    {
+        if(pointer != NULL)
+        {
+            *pointer = tree;
+        }
+        return true;
+    }
+    else
+    {
+        if(strcmp(tree->key, key) > 0)
+        {
+            return local_bst_search(tree->left, key, pointer);
+        }
+        else
+        {
+            return local_bst_search(tree->right, key, pointer);
+        }
+    }
+}
+
+void local_bst_delete(LocalBSTNodePtr *tree, char *key)
+{
+    // TODO
+}
+
+void local_bst_dispose(LocalBSTNodePtr *tree)
+{
+    if(*tree != NULL)
+    {
+        local_bst_dispose(&(*tree)->left);
+        local_bst_dispose(&(*tree)->right);
+        free(*tree);
+    }
+    (*tree) = NULL;
+}
 
 void global_bst_init(GlobalBSTNodePtr *tree)
 {
@@ -139,33 +173,3 @@ void global_bst_dispose(GlobalBSTNodePtr *tree)
     }
     (*tree) = NULL;
 }
-//
-//
-//void BST_DLL_Init(BSTDLList *list)
-//{
-//    list->first = NULL;
-//    list->last = NULL;
-//    list->active = NULL;
-//}
-//
-//void BST_DLL_Next(BSTDLList *list)
-//{
-//    if (list->active != NULL) {
-//        list->active = list->active->;
-//    }
-//}
-//
-//void BST_DLL_Dispose(BSTDLList *list)
-//{
-//
-//}
-//
-//void BST_DLL_InsertLast(BSTDLList *list, LocalBSTNodePtr nodePtr)
-//{
-//
-//}
-//
-//void BST_DLL_DeleteLast(BSTDLList *list)
-//{
-//
-//}

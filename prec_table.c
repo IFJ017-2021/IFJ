@@ -212,82 +212,84 @@ void expression(DLList *list, bool where_expression) {
 
   DLL_InsertLast(&prec_token_list, temp);
 
-  Stack *stack = (Stack *)malloc(sizeof(Stack));
-  Stack_Init(stack);
-  Stack_Push(stack, temp);
+    Stack_Token *stack = (Stack_Token * )malloc(sizeof (Stack_Token));
+    Stack_Token_Init(stack);
+    Stack_Token_Push(stack, temp);
 
-  Stack *stack_sym = (Stack *)malloc(sizeof(Stack));
-  Stack_Init(stack_sym);
-  Stack_Push(stack_sym, temp);
-  int count;
-  count = 0;
-  token_ptr expression_table[EX_TABLE];
+    Stack_Token *stack_sym = (Stack_Token* )malloc(sizeof (Stack_Token));
+    Stack_Token_Init(stack_sym);
+    Stack_Token_Push(stack_sym, temp);
+    int count;
+    count = 0;
+    token_ptr expression_table[EX_TABLE];
 
-  while (prec_token->type != T_P_DOLLAR || stack->array[stack->topIndex]->type != T_P_DOLLAR) {
-    token_ptr tmp;
-    Stack_Top(stack, &tmp);
-    int row = number_in_table(tmp, where_expression);
-    int col = number_in_table(prec_token, where_expression);
-    prec_table_actions action = precedence_table[row][col];
-    switch (action) {
-    case R:;
-      int num_symbols = 0;
-      token_ptr symbols[3];
-      while (stack_sym->array[stack_sym->topIndex]->type != T_OTHER) {
-        Stack_Top(stack_sym, &tmp);
-        Stack_Pop(stack_sym);
-        symbols[num_symbols] = tmp;
-        num_symbols++;
-      }
-      while (stack->array[stack->topIndex]->type != T_OTHER) {
-        Stack_Top(stack, &tmp);
-        Stack_Pop(stack);
-        if (tmp->type != T_LEFT_PAR && tmp->type != T_RIGHT_PAR &&
-            tmp->type != T_OTHER) {
-          expression_table[count] = tmp;
-          count++;
+
+    while (prec_token->type != T_P_DOLLAR || stack->array[stack->topIndex]->type != T_P_DOLLAR ){
+        token_ptr tmp;
+        Stack_Token_Top(stack, &tmp);
+        int row = number_in_table(tmp, where_expression);
+        int col = number_in_table(prec_token, where_expression);
+        prec_table_actions action = precedence_table[row][col];
+        switch (action) {
+            case R:;
+                int num_symbols = 0;
+                token_ptr symbols[3];
+                while (stack_sym->array[stack_sym->topIndex]->type != T_OTHER ){
+                    Stack_Token_Top(stack_sym, &tmp);
+                    Stack_Token_Pop(stack_sym);
+                    symbols[num_symbols] = tmp;
+                    num_symbols++;
+
+                }
+                while (stack->array[stack->topIndex]->type != T_OTHER ){
+                    Stack_Token_Top(stack, &tmp);
+                    Stack_Token_Pop(stack);
+                    if(tmp->type != T_LEFT_PAR && tmp->type != T_RIGHT_PAR && tmp->type != T_OTHER){
+                        expression_table[count] = tmp;
+                        count++;
+                    }
+                }
+                if( check_rule(num_symbols, symbols) == R_NOTDEFINED){
+                    err_call(ERR_SYNTAX, prec_token);
+                }
+                Stack_Token_Pop(stack);
+                Stack_Token_Pop(stack_sym);
+
+                token_ptr tmp = (token_ptr) malloc(sizeof (struct token));
+                tmp->type = T_P_E;
+                Stack_Token_Push(stack_sym, tmp);
+                break;
+            case S:;
+                token_ptr temp = (token_ptr) malloc(sizeof (struct token));
+                if(stack_sym->array[stack_sym->topIndex]->type == T_P_E){
+                    Stack_Token_Pop(stack_sym);
+                    temp->type = T_OTHER;
+                    Stack_Token_Push(stack, temp);
+                    Stack_Token_Push(stack_sym, temp);
+                    token_ptr temp2 = (token_ptr) malloc(sizeof (struct token));
+                    temp2->type = T_P_E;
+                    Stack_Token_Push(stack_sym, temp2);
+                } else{
+                    temp->type = T_OTHER;
+                    Stack_Token_Push(stack, temp);
+                    Stack_Token_Push(stack_sym, temp);
+                }
+                Stack_Token_Push(stack, prec_token);
+                Stack_Token_Push(stack_sym, prec_token);
+                DLL_Next(&prec_token_list);
+                DLL_GetValue(&prec_token_list, &prec_token);
+                break;
+            case E:
+                Stack_Token_Push(stack, prec_token);
+                Stack_Token_Push(stack_sym, prec_token);
+                DLL_Next(&prec_token_list);
+                DLL_GetValue(&prec_token_list, &prec_token);
+                break;
+            case X:
+                err_call(ERR_SYNTAX, prec_token);
+                break;
         }
-      }
-      if (check_rule(num_symbols, symbols) == R_NOTDEFINED) {
-        err_call(ERR_SYNTAX, prec_token);
-      }
-      Stack_Pop(stack);
-      Stack_Pop(stack_sym);
 
-      token_ptr tmp = (token_ptr)malloc(sizeof(struct token));
-      tmp->type = T_P_E;
-      Stack_Push(stack_sym, tmp);
-      break;
-    case S:;
-      token_ptr temp = (token_ptr)malloc(sizeof(struct token));
-      if (stack_sym->array[stack_sym->topIndex]->type == T_P_E) {
-        Stack_Pop(stack_sym);
-        temp->type = T_OTHER;
-        Stack_Push(stack, temp);
-        Stack_Push(stack_sym, temp);
-        token_ptr temp2 = (token_ptr)malloc(sizeof(struct token));
-        temp2->type = T_P_E;
-        Stack_Push(stack_sym, temp2);
-      } else {
-        temp->type = T_OTHER;
-        Stack_Push(stack, temp);
-        Stack_Push(stack_sym, temp);
-      }
-      Stack_Push(stack, prec_token);
-      Stack_Push(stack_sym, prec_token);
-      DLL_Next(&prec_token_list);
-      DLL_GetValue(&prec_token_list, &prec_token);
-      break;
-    case E:
-      Stack_Push(stack, prec_token);
-      Stack_Push(stack_sym, prec_token);
-      DLL_Next(&prec_token_list);
-      DLL_GetValue(&prec_token_list, &prec_token);
-      break;
-    case X:
-      err_call(ERR_SYNTAX, prec_token);
-      break;
     }
-  }
-  Stack_Pop(stack_sym);
+    Stack_Token_Pop(stack_sym);
 }
