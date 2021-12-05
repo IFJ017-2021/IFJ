@@ -10,7 +10,7 @@
 
 #include "parser.h"
 #include "error.h"
-#include "symtable.h"
+#include "symtable.c"
 #include "tokenList.h"
 #include "scanner.h"
 #include "prec_table.h"
@@ -416,7 +416,7 @@ void statement() {
                 GET_TOKEN()
                 DLL_DeleteBefore(&token_list);
             }
-            token_ptr prec_token1 = expression(&expression_list_if, 1, stack_bst_tree);
+            token_ptr prec_token1 = expression(&expression_list_while, 1, stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token1);
 
             CHECK_TYPE(T_K_DO);

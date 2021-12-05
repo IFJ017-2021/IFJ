@@ -253,28 +253,40 @@ char *string_postfix(token_ptr string_token){
             return a;
     }
 }
+/*
+int valid_operation(Stack_Token stack, token_ptr operation){
+    switch (operation->type) {
+        case T_ADD:
+        case T_SUB:
+        case T_MUL:
+        case T_DIV:
+        case T_IDIV:
+
+    }
+}
+*/
 
 token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
-  if (list == NULL) {
+    if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
-  }
-  if (list->first->next == NULL) {
+    }
+    if (list->first->next == NULL) {
       DLL_First(list);
       DLL_GetFirst(list, &prec_token);
       char *tmp = string_postfix(prec_token);
       prec_token->type = T_P_EXPRESSION;
       prec_token->data->string->data = tmp;
       return prec_token;
-  }
-  stack_bst_tree = stackBst;
+    }
+    stack_bst_tree = stackBst;
 
-  prec_token_list = *list;
-  DLL_First(&prec_token_list);
-  DLL_GetFirst(&prec_token_list, &prec_token);
-  token_ptr temp = (token_ptr)malloc(sizeof(struct token));
-  temp->type = T_P_DOLLAR;
+    prec_token_list = *list;
+    DLL_First(&prec_token_list);
+    DLL_GetFirst(&prec_token_list, &prec_token);
+    token_ptr temp = (token_ptr)malloc(sizeof(struct token));
+    temp->type = T_P_DOLLAR;
 
-  DLL_InsertLast(&prec_token_list, temp);
+    DLL_InsertLast(&prec_token_list, temp);
 
     Stack_Token *stack = (Stack_Token * )malloc(sizeof (Stack_Token));
     Stack_Token_Init(stack);
@@ -358,6 +370,27 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
     Stack_Token_Pop(stack_sym);
 
     // TODO sémantika
+    Stack_Token *sem_stack = (Stack_Token * )malloc(sizeof (Stack_Token));
+    Stack_Token_Init(sem_stack);
+    int j = 0;
+    while (expression_table[j]->type != T_ADD){
+        if(expression_table[j]->type == T_ID){
+            LocalBSTNodePtr tmpValue;
+            bool isFound = false;
+            for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
+                if (local_bst_search(stack_bst_tree.array[i], expression_table[j]->data->string->data, &tmpValue) == true) {
+                    isFound = true;
+                    break;
+                }
+            }
+            if (isFound == false) {
+                err_call(ERR_SMNTIC_UNDEFINED_V, expression_table[j]);
+            }
+        }
+        Stack_Token_Push(sem_stack, expression_table[j]);
+        j++;
+    }
+   // valid_operation(sem_stack, expression_table[j]);
 
     token_ptr result = (token_ptr) malloc(sizeof (struct token));
     result->data =  malloc(sizeof(struct token_data));
