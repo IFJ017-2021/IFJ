@@ -40,6 +40,7 @@ prec_table_actions precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
 token_ptr prec_token;
 DLList prec_token_list;
+Stack_Bst stack_bst_tree;
 
 int number_in_table(token_ptr token_table, bool a) {
   if (a == 0) {
@@ -199,17 +200,21 @@ prec_parsing_rules check_rule(int symbCount, token_ptr *tokens) {
 
 char *string_postfix(token_ptr string_token){
     char *a;
+    int count;
     switch (string_token->type) {
         case T_ID:
             return string_token->data->string->data;
-        case T_INT:
+        case T_INT:;
+            count = snprintf(NULL, 0, "%i", string_token->data->integer);
+            a = malloc(sizeof(char) * (count + 1));
             sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_STRING:
-            a = string_token->data->string->data;
-            return a;
-        case T_DOUBLE:
-            sprintf(a, "%f", string_token->data->number);
+            return string_token->data->string->data;
+        case T_DOUBLE:;
+            count = snprintf(NULL, 0, "%i", string_token->data->integer);
+            a = malloc(sizeof(char) * (count + 1));
+            sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_K_NIL:
             return "nil";
@@ -249,7 +254,7 @@ char *string_postfix(token_ptr string_token){
     }
 }
 
-token_ptr expression(DLList *list, bool where_expression) {
+token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
   }
@@ -261,6 +266,8 @@ token_ptr expression(DLList *list, bool where_expression) {
       prec_token->data->string->data = tmp;
       return prec_token;
   }
+  stack_bst_tree = stackBst;
+
   prec_token_list = *list;
   DLL_First(&prec_token_list);
   DLL_GetFirst(&prec_token_list, &prec_token);
@@ -350,24 +357,26 @@ token_ptr expression(DLList *list, bool where_expression) {
     }
     Stack_Token_Pop(stack_sym);
 
+    // TODO sémantika
+
     token_ptr result = (token_ptr) malloc(sizeof (struct token));
     result->data =  malloc(sizeof(struct token_data));
-    result->data->string =  malloc(sizeof(string));
     result->data->integer = 0;
     result->data->number = 0.0;
     result->type = T_P_EXPRESSION;
-
-    strInit(result->data->string);
+    string *s = malloc(sizeof(string));
+    strInit(s);
     int i=0;
     while (i < count){
         char *tmp = string_postfix(expression_table[i]);
         if(i != 0){
-            strcat(result->data->string->data, " ");
+            strAppendStr(s, " ");
         }
-        strcat(result->data->string->data, tmp);
+        strAppendStr(s, tmp);
         expression_table[i] = NULL;
         i++;
     }
     DLL_Dispose(&prec_token_list);
+    result->data->string = s;
     return result;
 }

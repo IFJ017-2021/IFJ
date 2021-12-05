@@ -56,7 +56,7 @@ int strAppendChar(string *s1, char toAppend){
         s1->data[s1->length] = '\0';
         return STR_OK;
     }else{ // There is not enough of the allocated memory --> increase
-        s1->data = (char *) realloc(s1->data, s1->length + STR_LEN_INC);
+        s1->data = (char *) realloc(s1->data, sizeof(char) * (s1->length + STR_LEN_INC));
         if(s1->data == NULL){
             return STR_ERR; // Allocation failed
         }
@@ -75,7 +75,7 @@ int strAppendStr(string *s1, const char *toAppendStr){
 
     if(s1->length + const_string_length + 1 >= s1->capacity){ // If we can't fit needed string to the string that is already made
         int new_capacity = s1->length + const_string_length + 1;
-        if(s1->data != (char *) realloc(s1->data, new_capacity)){ // Realloc not successful
+        if(s1->data != (char *) realloc(s1->data, sizeof(char) * new_capacity)){ // Realloc not successful
             return STR_ERR;
         }
         s1->capacity = new_capacity; // Allocate new capacity
