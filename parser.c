@@ -369,7 +369,7 @@ void statement() {
                 GET_TOKEN()
                 DLL_DeleteBefore(&token_list);
             }
-            token_ptr prec_token = expression(&expression_list_if, 1, stack_bst_tree);
+            token_ptr prec_token = expression(&expression_list_if, 1, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token);
 
             CHECK_TYPE(T_K_THEN);
@@ -416,7 +416,7 @@ void statement() {
                 GET_TOKEN()
                 DLL_DeleteBefore(&token_list);
             }
-            token_ptr prec_token1 = expression(&expression_list_while, 1, stack_bst_tree);
+            token_ptr prec_token1 = expression(&expression_list_while, 1, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token1);
 
             CHECK_TYPE(T_K_DO);
@@ -498,7 +498,7 @@ void entry_param(functionPtrData functionData) {
                 DLL_DeleteBefore(&token_list);
             }
         }
-        token_ptr prec_token = expression(&expression_list, 0, stack_bst_tree);
+        token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
         DLL_InsertAfter(&token_list, prec_token);
         GET_TOKEN()
     }
@@ -604,7 +604,7 @@ void return_list(functionPtrData functionData) {
                 }
             }
             GET_TOKEN()
-            token_ptr prec_token = expression(&expression_list, 0, stack_bst_tree);
+            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token);
 
             return_value_next();
@@ -662,7 +662,7 @@ void return_value_next(functionPtrData functionData) {
                 }
             }
             GET_TOKEN()
-            token_ptr prec_token = expression(&expression_list, 0, stack_bst_tree);
+            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token);
 
             return_value_next(functionData);
@@ -753,7 +753,7 @@ void init_value() {
                     DLL_DeleteBefore(&token_list);
                 }
             }
-            token_ptr prec_token = expression(&expression_list, 0, stack_bst_tree);
+            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertAfter(&token_list, prec_token);
             GET_TOKEN()
         }

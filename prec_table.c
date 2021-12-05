@@ -266,19 +266,19 @@ int valid_operation(Stack_Token stack, token_ptr operation){
 }
 */
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst stackBst) {
-    if (list == NULL) {
+token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst) {
+  if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
     }
-    if (list->first->next == NULL) {
+  if (list->first->next == NULL) {
       DLL_First(list);
       DLL_GetFirst(list, &prec_token);
       char *tmp = string_postfix(prec_token);
       prec_token->type = T_P_EXPRESSION;
       prec_token->data->string->data = tmp;
       return prec_token;
-    }
-    stack_bst_tree = stackBst;
+  }
+  stack_bst_tree = *stackBst;
 
     prec_token_list = *list;
     DLL_First(&prec_token_list);
