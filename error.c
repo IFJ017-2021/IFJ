@@ -3,6 +3,7 @@
  *
  *  @brief Implementation of printing error codes
  *
+ *  @author <xpoliv06> Tomáš Polívka
  *  @author <xhajek51> Vojtěch Hájek
  */
 #include "error.h"
@@ -27,7 +28,8 @@ void err_call(int error, token_ptr token) {
             fprintf(stderr, "ERR 3 - Semantic error (indefinite function or variable..)\n");
             break;
         case ERR_SMNTIC_TYPE:
-            fprintf(stderr, "ERR 4 - Semantic error (type incompatibility)");
+            fprintf(stderr, "ERR 4 - Semantic error (type incompatibility)\n");
+            fprintf(stderr, "Trying to assign another data type on line %d, near the colum %d\n", token->line_num, token->col_num);
             break;
         case ERR_SMNTIC_PARAMS:
             fprintf(stderr, "ERR 5 - Semantic error (wrong number / type of parameters or return values when calling a function or returning from a function");

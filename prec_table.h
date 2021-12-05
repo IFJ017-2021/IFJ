@@ -9,7 +9,7 @@
 #define IFJ_PREC_TABLE_H
 
 #include "tokenList.h"
-
+#include "stack.h"
 
 /**
  * @enum Precedence table symbols

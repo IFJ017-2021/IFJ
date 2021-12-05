@@ -11,51 +11,52 @@
 #define MAX_STACK 50
 
 #include "tokenList.h"
+#include "symtable.h"
 
-/**
- * @brief stack struct.
- */
-typedef struct {
-    token_ptr array[MAX_STACK];
-    int topIndex;
-} Stack;
+#define STACKDEC(T, TNAME)                                      \
+    /**                                                         \
+    * @brief stack struct.                                      \
+    */                                                          \
+    typedef struct {                                            \
+        T array[MAX_STACK];                                     \
+        int topIndex;                                           \
+    } Stack_##TNAME;                                            \
+                                                                \
+    /**                                                         \
+    * @brief Initialize of stack                                \
+    * @param stack Pointer to the stack struct                  \
+    */                                                          \
+    void Stack_##TNAME##_Init(Stack_##TNAME *stack );           \
+    /**                                                         \
+     * @brief Returns token from stack top                      \
+     * @param list Pointer to the stack struct                  \
+     * @param dataPtr Pointer to target variable                \
+     */                                                         \
+    void Stack_##TNAME##_Top(Stack_##TNAME *stack, T *data);    \
+    /**                                                         \
+     * @brief Removes value from top of the stack               \
+     * @param list Pointer to the stack struct                  \
+     */                                                         \
+    void Stack_##TNAME##_Pop(Stack_##TNAME*stack );             \
+    /**                                                         \
+     * @brief Returns not null value when stack is empty        \
+     * @param list Pointer to the stack struct                  \
+     */                                                         \
+    int Stack_##TNAME##_IsEmpty(Stack_##TNAME *stack );         \
+    /**                                                         \
+     * @brief Return not null value when stack is full          \
+     * @param list Pointer to the stack struct                  \
+     */                                                         \
+    int Stack_##TNAME##_IsFull(Stack_##TNAME *stack );          \
+    /**                                                         \
+     * @brief Adds value to top of the stack                    \
+     * @param list Pointer to the stack struct                  \
+     * @param token Value to insert                             \
+     */                                                         \
+    void Stack_##TNAME##_Push(Stack_##TNAME *stack, T data);
 
-/**
- * @brief Initialize of stack
- * @param stack Pointer to the stack struct
- */
-void Stack_Init( Stack *stack );
+STACKDEC(token_ptr, Token)
+STACKDEC(LocalBSTNodePtr, Bst)
 
-/**
- * @brief Returns token from stack top
- * @param list Pointer to the stack struct
- * @param token Pointer to target variable
- */
-void Stack_Top( Stack *stack, token_ptr *token);
-
-/**
- * @brief Removes value from top of the stack
- * @param list Pointer to the stack struct
- */
-void Stack_Pop( Stack *stack );
-
-/**
- * @brief Returns not null value when stack is empty
- * @param list Pointer to the stack struct
- */
-int Stack_IsEmpty( Stack *stack );
-
-/**
- * @brief Return not null value when stack is full
- * @param list Pointer to the stack struct
- */
-int Stack_IsFull( Stack *stack );
-
-/**
- * @brief Adds value to top of the stack
- * @param list Pointer to the stack struct
- * @param token Value to insert
- */
-void Stack_Push( Stack *stack, token_ptr token);
 
 #endif

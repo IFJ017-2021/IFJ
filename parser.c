@@ -82,7 +82,7 @@
 #define CHECK_RETURN_LIST_OF_TYPES_AND_SAVE_TO_FUNCTION_DATA()                              \
         GET_TOKEN()                                                                         \
         type_value();                                                                       \
-        functionData->returns[functionData->numOfReturns] = token->type;                    \
+        functionData->returnsType[functionData->numOfReturns] = token->type;                \
         functionData->numOfReturns++;                                                       \
         GET_TOKEN()                                                                         \
         return_type_next(functionData);
@@ -115,19 +115,24 @@
             err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, token_ID);                         \
         }                                                                                   \
         for(int i = 0; i < functionData->numOfReturns; i++){                                \
-            if (functionData->returns[i] != tmpData->returns[i]){                          \
+            if (functionData->returnsType[i] != tmpData->returnsType[i]){                   \
                 err_call(ERR_SMNTIC_RETURN_PARAMS_TYPE,token_ID);                           \
             }                                                                               \
         }
 
+Stack_Bst stack_bst_tree;
 GlobalBSTNodePtr bst_tree_of_functions;
 DLList token_list;
 token_ptr token;
+char* valueId;
+token_type valueType;
 
 void start(DLList *testlist) {
     // Insert into global frame built-in functions
     global_bst_init(&bst_tree_of_functions);
     built_in_functions();
+
+    Stack_Bst_Init(&stack_bst_tree);
 
     token_list = *testlist;
     DLL_First(&token_list);
@@ -147,6 +152,7 @@ void start(DLList *testlist) {
 
     GET_TOKEN()
     CHECK_TYPE(T_EOF);
+    global_bst_dispose(&bst_tree_of_functions);
 }
 
 void main_list() {
@@ -174,6 +180,16 @@ void main_list() {
             GET_TOKEN()
             list_of_params(functionData);
 
+            // Save list of params to local frame
+            LocalBSTNodePtr root;
+            local_bst_init(&root);
+            for (int i = 0; i < functionData->numOfParams; i++) {
+                local_bst_insert(&root, functionData->params[i], functionData->paramsType[i]);
+            }
+
+            // Push tree (local frame) to stack
+            Stack_Bst_Push(&stack_bst_tree, root);
+
             GET_TOKEN()
             CHECK_TYPE(T_RIGHT_PAR);
 
@@ -192,6 +208,8 @@ void main_list() {
             } else {
                 global_bst_insert(&bst_tree_of_functions, functionData->key, functionData);
             }
+
+            Stack_Bst_Pop(&stack_bst_tree);
 
             GET_TOKEN()
             main_next();
@@ -242,14 +260,8 @@ void main_list() {
             GET_TOKEN()
             CHECK_TYPE(T_RIGHT_PAR);
 
-            DLL_Next(&token_list);
-            DLL_GetValue(&token_list, &token);
-            while (token->type == T_EOL) {
-                DLL_Next(&token_list);
-                DLL_GetValue(&token_list, &token);
-            }
-
-            return_list_of_types();
+            GET_TOKEN()
+            return_list_of_types(functionData);
 
             // Vlozeni nove funkce do globalniho vyhledavaciho stromu
             global_bst_insert(&bst_tree_of_functions, functionData->key, functionData);
@@ -305,7 +317,7 @@ void statement() {
                 CHECK_TYPE(T_ASSIGN);
 
                 GET_TOKEN()
-                init_value(functionData);
+                init_value();
 
                 GET_TOKEN()
                 init_value_next();
@@ -317,12 +329,22 @@ void statement() {
         case T_K_LOCAL:
         GET_TOKEN()
             CHECK_TYPE(T_ID);
+            valueId = malloc(sizeof(char) * strlen(token->data->string->data));
+            strcpy(valueId ,token->data->string->data);
+            // Search in local frame to redeclare
+            if (local_bst_search(stack_bst_tree.array[stack_bst_tree.topIndex], token->data->string->data, NULL) == true){
+                err_call(ERR_SMNTIC_REDEFINE_V,token);
+            }
 
             GET_TOKEN()
             CHECK_TYPE(T_DOUBLE_DOT);
 
             GET_TOKEN()
             type_value();
+            valueType = token->type;
+
+            // Insert new declared value to BST
+            local_bst_insert(&stack_bst_tree.array[stack_bst_tree.topIndex], valueId, token->type);
 
             GET_TOKEN()
             init_local_value();
@@ -347,6 +369,12 @@ void statement() {
 
             CHECK_TYPE(T_K_THEN);
 
+            // Save list of params to local frame
+            LocalBSTNodePtr localFrame;
+            local_bst_init(&localFrame);
+            // Push tree (local frame) to stack
+            Stack_Bst_Push(&stack_bst_tree, localFrame);
+
             GET_TOKEN()
             statement();
 
@@ -355,6 +383,8 @@ void statement() {
 
             GET_TOKEN()
             CHECK_TYPE(T_K_END);
+
+            Stack_Bst_Pop(&stack_bst_tree);
 
             GET_TOKEN()
             statement();
@@ -648,7 +678,7 @@ void state_else() {
     }
 }
 
-void init_value(functionPtrData functionData) {
+void init_value() {
     if ((token->type == T_ID) || (token->type == T_INT)
         || (token->type == T_DOUBLE) || (token->type == T_STRING)
         || (token->type == T_STRLEN) || token->type == T_LEFT_PAR) {
@@ -687,6 +717,23 @@ void init_value(functionPtrData functionData) {
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
+            } else{
+
+                LocalBSTNodePtr tmpValue;
+                bool isFound = false;
+                for (int i = stack_bst_tree.topIndex; i >= 0 ; i--) {
+                    if(local_bst_search(stack_bst_tree.array[i], token->data->string->data, &tmpValue) == true){
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (isFound == false){
+                    err_call(ERR_SMNTIC_UNDEFINED_V, token);
+                }
+
+                if(valueType != tmpValue->type){
+                    err_call(ERR_SMNTIC_TYPE, token);
+                }
             }
         } else {
             DLList expression_list;
@@ -713,22 +760,22 @@ void init_value(functionPtrData functionData) {
     }
 }
 
-void init_value_next(functionPtrData functionData) {
+void init_value_next() {
     if (token->type == T_COMMA) {
         GET_TOKEN()
-        init_value(functionData);
+        init_value();
 
         GET_TOKEN()
-        init_value_next(functionData);
+        init_value_next();
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void init_local_value(functionPtrData functionData) {
+void init_local_value() {
     if (token->type == T_ASSIGN) {
         GET_TOKEN()
-        init_value(functionData);
+        init_value();
     } else {
         DLL_Previous(&token_list);
     }
@@ -767,17 +814,17 @@ void built_in_functions() {
     INIT_FUNCTION_DATA(reads)
     reads->numOfParams = 0;
     reads->numOfReturns = 1;
-    reads->returns[0] = T_K_STRING;
+    reads->returnsType[0] = T_K_STRING;
 
     INIT_FUNCTION_DATA(readi)
     readi->numOfParams = 0;
     readi->numOfReturns = 1;
-    readi->returns[0] = T_K_INTEGER;
+    readi->returnsType[0] = T_K_INTEGER;
 
     INIT_FUNCTION_DATA(readn)
     readn->numOfParams = 0;
     readn->numOfReturns = 1;
-    readn->returns[0] = T_K_NUMBER;
+    readn->returnsType[0] = T_K_NUMBER;
 
     INIT_FUNCTION_DATA(write)
     write->numOfParams = MAXPARAMS;
@@ -786,13 +833,13 @@ void built_in_functions() {
     INIT_FUNCTION_DATA(toInteger)
     toInteger->numOfParams = 1;
     toInteger->numOfReturns = 1;
-    toInteger->returns[0] = T_K_INTEGER;
+    toInteger->returnsType[0] = T_K_INTEGER;
     toInteger->paramsType[0] = T_K_NUMBER;
 
     INIT_FUNCTION_DATA(substr)
     substr->numOfParams = 3;
     substr->numOfReturns = 1;
-    substr->returns[0] = T_K_STRING;
+    substr->returnsType[0] = T_K_STRING;
     substr->paramsType[0] = T_K_STRING;
     substr->paramsType[1] = T_K_NUMBER;
     substr->paramsType[2] = T_K_NUMBER;
@@ -800,14 +847,14 @@ void built_in_functions() {
     INIT_FUNCTION_DATA(ord)
     ord->numOfParams = 2;
     ord->numOfReturns = 1;
-    ord->returns[0] = T_K_INTEGER;
+    ord->returnsType[0] = T_K_INTEGER;
     ord->paramsType[0] = T_K_STRING;
     ord->paramsType[1] = T_K_INTEGER;
 
     INIT_FUNCTION_DATA(chr)
     chr->numOfParams = 1;
     chr->numOfReturns = 1;
-    chr->returns[0] = T_K_INTEGER;
+    chr->returnsType[0] = T_K_INTEGER;
     chr->paramsType[0] = T_K_STRING;
 
     global_bst_insert(&bst_tree_of_functions, "reads", reads);

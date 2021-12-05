@@ -7,59 +7,47 @@
  */
 
 #include "stack.h"
+#include "tokenList.h"
 #include "error.h"
 
 int STACK_SIZE = MAX_STACK;
 
-void Stack_Init( Stack *stack ) {
-
-    if(stack == NULL){
-        err_call(ERR_INTERNAL, NULL);
+#define STACKDEC(T, TNAME)                                              \
+    void Stack_##TNAME##_Init(Stack_##TNAME *stack ) {                  \
+        if(stack == NULL){                                              \
+            err_call(ERR_INTERNAL, NULL);                               \
+        }                                                               \
+        else{                                                           \
+            stack->topIndex = -1;                                       \
+        }                                                               \
+    }                                                                   \
+    int Stack_##TNAME##_IsEmpty(Stack_##TNAME *stack ) {                \
+        return (stack->topIndex == -1);                                 \
+    }                                                                   \
+    int Stack_##TNAME##_IsFull(Stack_##TNAME *stack ) {                 \
+        return (stack->topIndex == STACK_SIZE-1);                       \
+    }                                                                   \
+    void Stack_##TNAME##_Top(Stack_##TNAME *stack, T *data ){           \
+        if(!Stack_Token_IsEmpty(stack)){                                \
+            *data = stack->array[stack->topIndex];                      \
+        }                                                               \
+        else{                                                           \
+            err_call(ERR_INTERNAL, NULL);                               \
+        }                                                               \
+    }                                                                   \
+    void Stack_##TNAME##_Pop(Stack_##TNAME *stack ) {                   \
+        if(!Stack_Token_IsEmpty(stack)){                                \
+            stack->topIndex--;                                          \
+        }                                                               \
+    }                                                                   \
+    void Stack_##TNAME##_Push(Stack_##TNAME *stack, T token ) {         \
+        if(!Stack_Token_IsFull(stack)){                                 \
+            stack->array[++stack->topIndex] = token;                    \
+        }                                                               \
+        else{                                                           \
+            err_call(ERR_INTERNAL, NULL);                               \
+        }                                                               \
     }
-    else{
-        stack->topIndex = -1;
-    }
-}
-/* Stack_Init */
 
-int Stack_IsEmpty( Stack *stack ) {
-
-    return (stack->topIndex == -1);
-}
-/* Stack_IsEmpty */
-
-int Stack_IsFull( Stack *stack ) {
-
-    return (stack->topIndex == STACK_SIZE-1);
-}
-/* Stack_IsFull */
-
-void Stack_Top( Stack *stack, token_ptr *dataPtr ) {
-
-    if(!Stack_IsEmpty(stack)){
-        *dataPtr = stack->array[stack->topIndex];
-    }
-    else{
-        err_call(ERR_INTERNAL, NULL);
-    }
-}
-/* Stack_Top */
-
-void Stack_Pop( Stack *stack ) {
-
-    if(!Stack_IsEmpty(stack)){
-        stack->topIndex--;
-    }
-}
-/* Stack_Pop */
-
-void Stack_Push( Stack *stack, token_ptr token ) {
-
-    if(!Stack_IsFull(stack)){
-        stack->array[++stack->topIndex] = token;
-    }
-    else{
-        err_call(ERR_INTERNAL, NULL);
-    }
-}
-/* Stack_Push */
+STACKDEC(token_ptr, Token)
+STACKDEC(LocalBSTNodePtr, Bst)
