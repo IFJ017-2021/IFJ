@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file main.c
  *
  *  @brief Main file of the program.

@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file str.c
  *
  *  @brief Library that enables working with dynamic strings

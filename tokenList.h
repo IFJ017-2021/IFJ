@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file tokenList.h
  *
  *  @brief Header file for tokenList.c (Doubly linked list of tokens).

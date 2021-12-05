@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file str.h
  *
  *  @brief Header file for str.c (Header file that enables working with dynamic strings)

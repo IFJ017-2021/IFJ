@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file parser.h
  *
  *  @brief Header file for parser.c (Syntax and semantic  analyzer).
