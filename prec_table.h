@@ -11,6 +11,7 @@
 #define IFJ_PREC_TABLE_H
 
 #include "tokenList.h"
+#include "stack.h"
 #include "stdbool.h"
 
 /**

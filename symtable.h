@@ -15,15 +15,6 @@
 #define MAXPARAMS 256
 
 /**
- * @brief Doubly linked list of BST
- */
-typedef struct {
-    struct LocalBSTNode *first;
-    struct LocalBSTNode *active;
-    struct LocalBSTNode *last;
-} BSTDLList;
-
-/**
  * @brief Struct for node of local tree
  */
 typedef struct LocalBSTNode {
@@ -42,7 +33,7 @@ typedef struct functionData{
     char *params[MAXPARAMS];
     char *key;
     token_type paramsType[MAXPARAMS];
-    token_type returns[MAXPARAMS];
+    token_type returnsType[MAXPARAMS];
 } *functionPtrData;
 
 /**
@@ -57,44 +48,44 @@ typedef struct GlobalBSTNode {
 
 // Function for LOCAL_BST
 
-///**
-// * @brief
-// *
-// * @param tree
-// */
-//void local_bst_init(LocalBSTNodePtr *tree);
-//
-///**
-// * @brief
-// *
-// * @param tree
-// * @param key
-// * @param type
-// */
-//void local_bst_insert(LocalBSTNodePtr *tree, char *key, ValueType type);
-//
-///**
-// * @brief
-// *
-// * @param tree
-// * @param key
-// */
-//bool local_bst_search(LocalBSTNodePtr tree, char *key);
-//
-///**
-// * @brief
-// *
-// * @param tree
-// * @param key
-// */
-//void local_bst_delete(LocalBSTNodePtr *tree, char *key);
-//
-///**
-// * @brief
-// *
-// * @param tree
-// */
-//void local_bst_dispose(LocalBSTNodePtr *tree);
+/**
+ * @brief
+ *
+ * @param tree
+ */
+void local_bst_init(LocalBSTNodePtr *tree);
+
+/**
+ * @brief
+ *
+ * @param tree
+ * @param key
+ * @param type
+ */
+void local_bst_insert(LocalBSTNodePtr *tree, char *key, token_type type);
+
+/**
+ * @brief
+ *
+ * @param tree
+ * @param key
+ */
+bool local_bst_search(LocalBSTNodePtr tree, char *key, LocalBSTNodePtr *pointer);
+
+/**
+ * @brief
+ *
+ * @param tree
+ * @param key
+ */
+void local_bst_delete(LocalBSTNodePtr *tree, char *key);
+
+/**
+ * @brief
+ *
+ * @param tree
+ */
+void local_bst_dispose(LocalBSTNodePtr *tree);
 
 // Function for GLOBAL_BST
 
@@ -128,38 +119,5 @@ void global_bst_insert(GlobalBSTNodePtr *tree, char *key, functionPtrData functi
  * @param tree
  */
 void global_bst_dispose(GlobalBSTNodePtr *tree);
-
-// Function for BST_DLL
-
-///**
-// * @brief List initialization
-// * @param list Pointer to the structure of a doubly linked list
-// */
-//void BST_DLL_Init(BSTDLList *list);
-//
-///**
-// * @brief Moves the activity to the next list element.
-// * @param list Pointer to the structure of a doubly linked list
-// */
-//void BST_DLL_Next(BSTDLList *list);
-//
-///**
-// * @brief List dispose
-// * @param list Pointer to the structure of a doubly linked list
-// */
-//void BST_DLL_Dispose(BSTDLList *list);
-//
-///**
-// * @brief Inserts new element at the end of the list
-// * @param list Pointer to the structure of a doubly linked list
-// * @param token Value to insert at the end of the list
-// */
-//void BST_DLL_InsertLast(BSTDLList *list, LocalBSTNodePtr nodePtr);
-//
-///**
-// * @brief Deletes last element in the list
-// * @param list Pointer to the structure of a doubly linked list
-// */
-//void BST_DLL_DeleteLast(BSTDLList *list);
 
 #endif
