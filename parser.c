@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file parser.h
  *
  *  @brief Header file for parser.c (Syntax and semantic  analyzer).
@@ -31,24 +32,18 @@
       (token->type != T_K_STRING) && (token->type != T_K_NIL))                  \
   err_call(ERR_SYNTAX, token)
 
-#define  IS_EXPRESSION()                                                        \
-    if((token->next->type != T_EQL)                                             \
-    && (token->next->type != T_GT)                                              \
-    && (token->next->type != T_GTE)                                             \
-    && (token->next->type != T_LT)                                              \
-    && (token->next->type != T_LTE)                                             \
-    && (token->next->type != T_NEQL)                                            \
-    && (token->next->type != T_MUL)                                             \
-    && (token->next->type != T_SUB)                                             \
-    && (token->next->type != T_ADD)                                             \
-    && (token->next->type != T_DIV)                                             \
-    && (token->next->type != T_IDIV)                                            \
-    && (token->next->type != T_STRLEN)                                          \
-    && (token->next->type != T_CONCAT)                                          \
-    ){break;}                                                                   \
-    else{                                                                       \
-        GET_TOKEN()                                                             \
-    }
+#define IS_EXPRESSION()                                                        \
+  if ((token->next->type != T_EQL) && (token->next->type != T_GT) &&           \
+      (token->next->type != T_GTE) && (token->next->type != T_LT) &&           \
+      (token->next->type != T_LTE) && (token->next->type != T_NEQL) &&         \
+      (token->next->type != T_MUL) && (token->next->type != T_SUB) &&          \
+      (token->next->type != T_ADD) && (token->next->type != T_DIV) &&          \
+      (token->next->type != T_IDIV) && (token->next->type != T_STRLEN) &&      \
+      (token->next->type != T_CONCAT)) {                                       \
+    break;                                                                     \
+  } else {                                                                     \
+    GET_TOKEN()                                                                \
+  }
 
 #define INIT_TOKEN_POINTER()                                                    \
         token_ptr tmp = (token_ptr) malloc(sizeof(struct token));               \
@@ -95,12 +90,12 @@
         GET_TOKEN()                                                                         \
         type_next(functionData);
 
-#define CHECK_COUNT_OF_PARAMS();                                                            \
+#define CHECK_COUNT_OF_PARAMS()                                                            \
         if(functionData->numOfParams != tmpData->numOfParams){                              \
             err_call(ERR_SMNTIC_NUMBER_OF_PARAMS,token_ID);                                 \
         }
 
-#define CHECK_COUNT_AND_TYPES_OF_PARAMS();                                                  \
+#define CHECK_COUNT_AND_TYPES_OF_PARAMS()                                                  \
         if(functionData->numOfParams != tmpData->numOfParams){                              \
             err_call(ERR_SMNTIC_NUMBER_OF_PARAMS,token_ID);                                 \
         }                                                                                   \
@@ -110,7 +105,7 @@
             }                                                                               \
         }
 
-#define CHECK_COUNT_AND_TYPES_OF_RETURN_PARAMS();                                           \
+#define CHECK_COUNT_AND_TYPES_OF_RETURN_PARAMS()                                           \
         if(functionData->numOfReturns != tmpData->numOfReturns){                            \
             err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, token_ID);                         \
         }                                                                                   \
@@ -243,7 +238,8 @@ void main_list() {
                 err_call(ERR_SMNTIC_REDEFINE_F, token);
             }
 
-            functionData->key = token->data->string->data;
+            functionData->key = malloc(sizeof(char) * strlen(token->data->string->data));
+            strcpy(functionData->key, token->data->string->data);
 
             GET_TOKEN()
             CHECK_TYPE(T_DOUBLE_DOT);
@@ -365,7 +361,7 @@ void statement() {
                 }
                 GET_TOKEN()
             }
-            expression(&expression_list_if);
+            expression(&expression_list_if, 1);
 
             CHECK_TYPE(T_K_THEN);
 
@@ -409,7 +405,7 @@ void statement() {
                 }
                 GET_TOKEN()
             }
-            expression(&expression_list_while);
+            expression(&expression_list_while, 1);
 
             CHECK_TYPE(T_K_DO);
 
@@ -448,56 +444,50 @@ void param_next(functionPtrData functionData) {
 }
 
 void entry_list_params(functionPtrData functionData) {
-    if ((token->type == T_ID) || (token->type == T_INT)
-        || (token->type == T_DOUBLE) || (token->type == T_STRING)
-        || (token->type == T_STRLEN) || (token->type == T_LEFT_PAR)) {
-        entry_param(functionData);
-        GET_TOKEN()
-        entry_param_next(functionData);
-    } else {
-        DLL_Previous(&token_list);
-    }
+  if ((token->type == T_ID) || (token->type == T_INT) ||
+      (token->type == T_DOUBLE) || (token->type == T_STRING) ||
+      (token->type == T_STRLEN) || (token->type == T_LEFT_PAR) ||
+      token->type == T_K_NIL) {
+    entry_param(functionData);
+    GET_TOKEN()
+    entry_param_next(functionData);
+  } else {
+    DLL_Previous(&token_list);
+  }
 }
 
 void entry_param(functionPtrData functionData) {
-    if ((token->type == T_ID)
-        && (token->next->type != T_EQL)
-        && (token->next->type != T_GT)
-        && (token->next->type != T_GTE)
-        && (token->next->type != T_LT)
-        && (token->next->type != T_LTE)
-        && (token->next->type != T_NEQL)
-        && (token->next->type != T_MUL)
-        && (token->next->type != T_SUB)
-        && (token->next->type != T_ADD)
-        && (token->next->type != T_DIV)
-        && (token->next->type != T_IDIV)
-        && (token->next->type != T_STRLEN)
-        && (token->next->type != T_CONCAT)) {
+  if ((token->type == T_ID) && (token->next->type != T_EQL) &&
+      (token->next->type != T_GT) && (token->next->type != T_GTE) &&
+      (token->next->type != T_LT) && (token->next->type != T_LTE) &&
+      (token->next->type != T_NEQL) && (token->next->type != T_MUL) &&
+      (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
+      (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
+      (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
 
-    } else {
-        DLList expression_list;
-        DLL_Init(&expression_list);
-        while (token->type != T_EOF) {
-            INIT_TOKEN_POINTER()
-            DLL_InsertLast(&expression_list, tmp);
-            if (token->type == T_LEFT_PAR) {
-                GET_TOKEN()
-                expression_par_tmp(&expression_list);
-            }
-            if ((token->type == T_ID) || (token->type == T_INT)
-                || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                || (token->type == T_RIGHT_PAR)) {
-                IS_EXPRESSION()
-            } else {
-                GET_TOKEN()
-            }
-        }
-        expression(&expression_list);
+  } else {
+    DLList expression_list;
+    DLL_Init(&expression_list);
+    while (token->type != T_EOF) {
+      INIT_TOKEN_POINTER()
+      DLL_InsertLast(&expression_list, tmp);
+      if (token->type == T_LEFT_PAR) {
+        GET_TOKEN()
+        expression_par_tmp(&expression_list);
+      }
+      if ((token->type == T_ID) || (token->type == T_INT) ||
+          (token->type == T_DOUBLE) || (token->type == T_STRING) ||
+          (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
+        IS_EXPRESSION()
+      } else {
+        GET_TOKEN()
+      }
     }
-    functionData->paramsType[functionData->numOfParams] = token->type;
-    functionData->params[functionData->numOfParams] = token->data->string->data;
-    functionData->numOfParams++;
+    expression(&expression_list, 0);
+  }
+  functionData->paramsType[functionData->numOfParams] = token->type;
+  functionData->params[functionData->numOfParams] = token->data->string->data;
+  functionData->numOfParams++;
 }
 
 void entry_param_next(functionPtrData functionData) {
@@ -552,83 +542,69 @@ void return_type_next(functionPtrData functionData) {
 void type_value() { IS_TYPE_VALUE(); }
 
 void return_list(functionPtrData functionData) {
-    if (token->type == T_ID || token->type == T_STRING
-        || token->type == T_INT || token->type == T_DOUBLE
-        || token->type == T_STRLEN || token->type == T_LEFT_PAR) {
-        if ((token->type == T_ID)
-            && (token->next->type != T_EQL)
-            && (token->next->type != T_GT)
-            && (token->next->type != T_GTE)
-            && (token->next->type != T_LT)
-            && (token->next->type != T_LTE)
-            && (token->next->type != T_NEQL)
-            && (token->next->type != T_MUL)
-            && (token->next->type != T_SUB)
-            && (token->next->type != T_ADD)
-            && (token->next->type != T_DIV)
-            && (token->next->type != T_IDIV)
-            && (token->next->type != T_STRLEN)
-            && (token->next->type != T_CONCAT)) {
-            GET_TOKEN()
-            if (token->type == T_LEFT_PAR) {
-                GET_TOKEN()
-                entry_list_params(functionData);
+  if (token->type == T_ID || token->type == T_STRING || token->type == T_INT ||
+      token->type == T_DOUBLE || token->type == T_STRLEN ||
+      token->type == T_LEFT_PAR || token->type == T_K_NIL) {
+    if ((token->type == T_ID) && (token->next->type != T_EQL) &&
+        (token->next->type != T_GT) && (token->next->type != T_GTE) &&
+        (token->next->type != T_LT) && (token->next->type != T_LTE) &&
+        (token->next->type != T_NEQL) && (token->next->type != T_MUL) &&
+        (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
+        (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
+        (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
+      GET_TOKEN()
+      if (token->type == T_LEFT_PAR) {
+        GET_TOKEN()
+        entry_list_params(functionData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                GET_TOKEN()
-                return_value_next();
-            } else {
-                return_value_next();
-            }
-        } else {
-            DLList expression_list;
-            DLL_Init(&expression_list);
-            while (token->type != T_EOF) {
-                INIT_TOKEN_POINTER()
-                DLL_InsertLast(&expression_list, tmp);
-                if (token->type == T_LEFT_PAR) {
-                    GET_TOKEN()
-                    expression_par_tmp(&expression_list);
-                }
-                if ((token->type == T_ID) || (token->type == T_INT)
-                    || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
-                    IS_EXPRESSION()
-                } else {
-                    GET_TOKEN()
-                }
-            }
-            expression(&expression_list);
-            GET_TOKEN()
-            return_value_next();
-        }
+        GET_TOKEN()
+        return_value_next();
+      } else {
+        return_value_next();
+      }
     } else {
-        DLL_Previous(&token_list);
+      DLList expression_list;
+      DLL_Init(&expression_list);
+      while (token->type != T_EOF) {
+        INIT_TOKEN_POINTER()
+        DLL_InsertLast(&expression_list, tmp);
+        if (token->type == T_LEFT_PAR) {
+          GET_TOKEN()
+          expression_par_tmp(&expression_list);
+        }
+        if ((token->type == T_ID) || (token->type == T_INT) ||
+            (token->type == T_DOUBLE) || (token->type == T_STRING) ||
+            (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
+          IS_EXPRESSION()
+        } else {
+          GET_TOKEN()
+        }
+      }
+      expression(&expression_list, 0);
+      GET_TOKEN()
+      return_value_next();
     }
+  } else {
+    DLL_Previous(&token_list);
+  }
 }
 
 void return_value_next(functionPtrData functionData) {
-    if (token->type == T_COMMA) {
+  if (token->type == T_COMMA) {
+    GET_TOKEN()
+    if ((token->type == T_ID) && (token->next->type != T_EQL) &&
+        (token->next->type != T_GT) && (token->next->type != T_GTE) &&
+        (token->next->type != T_LT) && (token->next->type != T_LTE) &&
+        (token->next->type != T_NEQL) && (token->next->type != T_MUL) &&
+        (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
+        (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
+        (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
+      if (token->next->type == T_LEFT_PAR) {
         GET_TOKEN()
-        if ((token->type == T_ID)
-            && (token->next->type != T_EQL)
-            && (token->next->type != T_GT)
-            && (token->next->type != T_GTE)
-            && (token->next->type != T_LT)
-            && (token->next->type != T_LTE)
-            && (token->next->type != T_NEQL)
-            && (token->next->type != T_MUL)
-            && (token->next->type != T_SUB)
-            && (token->next->type != T_ADD)
-            && (token->next->type != T_DIV)
-            && (token->next->type != T_IDIV)
-            && (token->next->type != T_STRLEN)
-            && (token->next->type != T_CONCAT)) {
-            if (token->next->type == T_LEFT_PAR) {
-                GET_TOKEN()
-                CHECK_TYPE(T_LEFT_PAR);
+        CHECK_TYPE(T_LEFT_PAR);
 
                 GET_TOKEN()
                 entry_list_params(functionData);
@@ -636,37 +612,37 @@ void return_value_next(functionPtrData functionData) {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                GET_TOKEN()
-                return_value_next(functionData);
-            } else {
-                GET_TOKEN()
-                return_value_next(functionData);
-            }
-        } else {
-            DLList expression_list;
-            DLL_Init(&expression_list);
-            while (token->type != T_EOF) {
-                INIT_TOKEN_POINTER()
-                DLL_InsertLast(&expression_list, tmp);
-                if (token->type == T_LEFT_PAR) {
-                    GET_TOKEN()
-                    expression_par_tmp(&expression_list);
-                }
-                if ((token->type == T_ID) || (token->type == T_INT)
-                    || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
-                    IS_EXPRESSION()
-                } else {
-                    GET_TOKEN()
-                }
-            }
-            expression(&expression_list);
-            GET_TOKEN()
-            return_value_next(functionData);
-        }
+        GET_TOKEN()
+        return_value_next(functionData);
+      } else {
+        GET_TOKEN()
+        return_value_next(functionData);
+      }
     } else {
-        DLL_Previous(&token_list);
+      DLList expression_list;
+      DLL_Init(&expression_list);
+      while (token->type != T_EOF) {
+        INIT_TOKEN_POINTER()
+        DLL_InsertLast(&expression_list, tmp);
+        if (token->type == T_LEFT_PAR) {
+          GET_TOKEN()
+          expression_par_tmp(&expression_list);
+        }
+        if ((token->type == T_ID) || (token->type == T_INT) ||
+            (token->type == T_DOUBLE) || (token->type == T_STRING) ||
+            (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
+          IS_EXPRESSION()
+        } else {
+          GET_TOKEN()
+        }
+      }
+      expression(&expression_list, 0);
+      GET_TOKEN()
+      return_value_next(functionData);
     }
+  } else {
+    DLL_Previous(&token_list);
+  }
 }
 
 void state_else() {
@@ -679,27 +655,21 @@ void state_else() {
 }
 
 void init_value() {
-    if ((token->type == T_ID) || (token->type == T_INT)
-        || (token->type == T_DOUBLE) || (token->type == T_STRING)
-        || (token->type == T_STRLEN) || token->type == T_LEFT_PAR) {
-        if ((token->type == T_ID)
-            && (token->next->type != T_EQL)
-            && (token->next->type != T_GT)
-            && (token->next->type != T_GTE)
-            && (token->next->type != T_LT)
-            && (token->next->type != T_LTE)
-            && (token->next->type != T_NEQL)
-            && (token->next->type != T_MUL)
-            && (token->next->type != T_SUB)
-            && (token->next->type != T_ADD)
-            && (token->next->type != T_DIV)
-            && (token->next->type != T_IDIV)
-            && (token->next->type != T_STRLEN)
-            && (token->next->type != T_CONCAT)) {
-            if (token->next->type == T_LEFT_PAR) {
-                token_ptr token_ID = token;
-                functionPtrData tmpData;
-                INIT_FUNCTION_DATA(functionData)
+  if ((token->type == T_ID) || (token->type == T_INT) ||
+      (token->type == T_DOUBLE) || (token->type == T_STRING) ||
+      (token->type == T_STRLEN) || token->type == T_LEFT_PAR ||
+      token->type == T_K_NIL) {
+    if ((token->type == T_ID) && (token->next->type != T_EQL) &&
+        (token->next->type != T_GT) && (token->next->type != T_GTE) &&
+        (token->next->type != T_LT) && (token->next->type != T_LTE) &&
+        (token->next->type != T_NEQL) && (token->next->type != T_MUL) &&
+        (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
+        (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
+        (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
+      if (token->next->type == T_LEFT_PAR) {
+        token_ptr token_ID = token;
+        functionPtrData tmpData;
+        INIT_FUNCTION_DATA(functionData)
 
                 if (global_bst_search(bst_tree_of_functions, token->data->string->data, &tmpData) == 0) {
                     err_call(ERR_SMNTIC_UNDEFINED_F, token);
@@ -717,24 +687,24 @@ void init_value() {
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
-            } else{
+            }else{
 
-                LocalBSTNodePtr tmpValue;
-                bool isFound = false;
-                for (int i = stack_bst_tree.topIndex; i >= 0 ; i--) {
-                    if(local_bst_search(stack_bst_tree.array[i], token->data->string->data, &tmpValue) == true){
-                        isFound = true;
-                        break;
-                    }
-                }
-                if (isFound == false){
-                    err_call(ERR_SMNTIC_UNDEFINED_V, token);
-                }
+          LocalBSTNodePtr tmpValue;
+          bool isFound = false;
+          for (int i = stack_bst_tree.topIndex; i >= 0 ; i--) {
+              if(local_bst_search(stack_bst_tree.array[i], token->data->string->data, &tmpValue) == true){
+                  isFound = true;
+                  break;
+              }
+          }
+          if (isFound == false){
+              err_call(ERR_SMNTIC_UNDEFINED_V, token);
+          }
 
-                if(valueType != tmpValue->type){
-                    err_call(ERR_SMNTIC_TYPE, token);
-                }
-            }
+          if(valueType != tmpValue->type){
+              err_call(ERR_SMNTIC_TYPE, token);
+          }
+      }
         } else {
             DLList expression_list;
             DLL_Init(&expression_list);
@@ -747,13 +717,13 @@ void init_value() {
                 }
                 if ((token->type == T_ID) || (token->type == T_INT)
                     || (token->type == T_DOUBLE) || (token->type == T_STRING)
-                    || (token->type == T_RIGHT_PAR)) {
+                    || (token->type == T_RIGHT_PAR) || (token->type == T_K_NIL)) {
                     IS_EXPRESSION()
                 } else {
                     GET_TOKEN()
                 }
             }
-            expression(&expression_list);
+            expression(&expression_list, 0);
         }
     } else {
         DLL_Previous(&token_list);
@@ -808,7 +778,6 @@ void expression_par_tmp(DLList *list) {
     INIT_TOKEN_POINTER()
     DLL_InsertLast(list, tmp);
 }
-
 
 void built_in_functions() {
     INIT_FUNCTION_DATA(reads)

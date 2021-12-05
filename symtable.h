@@ -1,4 +1,5 @@
 /**
+ *  Project: Implementation of imperative language compiler IFJ21
  *  @file symtable.h
  *
  *  @brief Header file for symtable.c

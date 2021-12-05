@@ -1,23 +1,31 @@
 require "ifj21"
 
-function foo(x : integer, y : integer) : integer, integer
-  local i : integer = x
-  local j : integer = (x+) * 3
-  i, j = j+1, i+1  -- vyhodnocuj zprava a přiřazuj později
-  return i, j
-end
+function main()
 
-function main() 
-  local a : integer = 1
-  local b : integer = 2
-  a, b = foo(a, b)  -- returns 13, 2
-  if a < b then
-    write(a, "<", b, "\n")
-  else
-    write(a, ">=", b, "\n")
-    local a : integer = 666  -- Teal varuje, ze redefinice (prekryti)
-    write(a, "\n")
-  end
-  write(a, "\n")  --[[ prints 13 ]]
+    local n:integer = 5 + a
+
+    if x == nil then
+        write("yes\n")
+    else
+        write("no\n")
+    end
+
+    if y == nil then
+        write("yes\n")
+    else
+        write("no\n")
+    end
+
+    if z == nil then
+        write("yes\n")
+    else
+        write("no\n")
+    end
+
+    if n == nil then
+        write("yes\n")
+    else
+        write("no\n")
+    end
 end
 main()
