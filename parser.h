@@ -12,6 +12,7 @@
 
 #include "tokenList.h"
 #include "symtable.h"
+#include "stack.h"
 
 /**
  * @brief Implementation START rule. <br>
@@ -128,14 +129,14 @@ void type_value();
  * 2) value_id RETURN_VALUE_NEXT<br>
  * @param ... ?
 */
-void return_list();
+void return_list(Stack_Token *return_values);
 
 /**
  * @brief Implementation of RETURN_LIST rule. <br>
  * 1) , value_id RETURN_VALUE_NEXT <br>
  * @param ... ?
 */
-void return_value_next();
+void return_value_next(Stack_Token *return_values);
 
 /**
  * @brief Implementation of STATE_ELSE rule. <br>
@@ -151,14 +152,14 @@ void state_else();
  * 3) value_id <br>
  * @param ... ?
 */
-void init_value();
+void init_value(bool isLocal, Stack_Token *stack_of_values);
 
 /**
  * @brief Implementation of INIT_VALUE_NEXT rule. <br>
  * 1) , INIT_VALUE INIT_VALUE_NEXT <br>
  * @param ... ?
 */
-void init_value_next();
+void init_value_next(Stack_Token *stack_of_values);
 
 /**
  * @brief Implementation of INIT_LOCAL_VALUE rule. <br>
@@ -172,7 +173,7 @@ void init_local_value();
  * 1) , value_id VALUE_ID_NEXT <br>
  * @param ... ?
 */
-void value_id_next();
+void value_id_next(Stack_Token *stack_of_ids);
 
 /**
  * @brief Help function to process expression with pars <br>
