@@ -240,16 +240,21 @@ void main_list() {
             CHECK_TYPE(T_LEFT_PAR);
 
             GET_TOKEN()
-            entry_list_params(functionData);
+            entry_list_params(functionData, tmpData);
 
             GET_TOKEN()
             CHECK_TYPE(T_RIGHT_PAR);
 
-            // TODO zkontrolovat typy jednotlivých ID
+            // Pokud se jedná o funci write, nekontroluje se počet typů
             if (strcmp(token_ID->data->string->data, "write") != 0) {
                 CHECK_COUNT_OF_PARAMS()
             }
 
+            for (int i = 0; i < functionData->numOfParams; i++) {
+                if (functionData->paramsType[i] == T_ID){
+                    err_call(ERR_SMNTIC_UNDEFINED_V, token_ID);
+                }
+            }
             GET_TOKEN()
             main_next();
             break;
@@ -312,20 +317,41 @@ void statement() {
         case T_ID:
             if (token->next->type == T_LEFT_PAR) {
                 token_ID = token;
-                if (global_bst_search(bst_tree_of_functions, token->data->string->data, &tmpData) == 0) {
-                    err_call(ERR_SMNTIC_UNDEFINED_F, token);
-                }
+                FUNCTION_IS_NOT_DEFINED()
 
                 GET_TOKEN()
                 GET_TOKEN()
-                entry_list_params(functionData);
+                entry_list_params(functionData, tmpData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                // TODO zkontrolovat typy
+                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
+                    for (int i = 0; i < functionData->numOfParams; i++){
+                        LocalBSTNodePtr tmpValue;
+                        bool isFound = false;
+                        // Pokud je typ expression přeskočí se kontroly
+                        if (functionData->paramsType[i] == T_P_EXPRESSION){
+                            continue;
+                        }
+                        for (int j = stack_bst_tree.topIndex; j >= 0; j--) {
+                            if (local_bst_search(stack_bst_tree.array[j],
+                                                 functionData->params[i],
+                                                 &tmpValue) == true) {
+                                isFound = true;
+                                break;
+                            }
+                        }
+                        if (isFound == false) {
+                            err_call(ERR_SMNTIC_UNDEFINED_V, token_ID);
+                        }
+                        if(tmpValue->type != tmpData->paramsType[i] &&
+                           T_P_EXPRESSION != tmpData->paramsType[i]){
+                            err_call(ERR_SMNTIC_TYPE, token_ID);
+                        }
+                    }
                 }
 
                 GET_TOKEN()
@@ -343,10 +369,10 @@ void statement() {
                 Stack_Token *stack_of_values = malloc(sizeof(Stack_Token));
                 Stack_Token_Init(stack_of_values);
                 GET_TOKEN()
-                init_value(false, stack_of_values);
+                init_value(false, stack_of_values, stack_of_ids);
 
                 GET_TOKEN()
-                init_value_next(stack_of_values);
+                init_value_next(stack_of_values, stack_of_ids);
 
                 // Kotrola počtu přiřazených hodnot a jednotlivých typů
                 if(stack_of_ids->topIndex != stack_of_values->topIndex){
@@ -427,7 +453,7 @@ void statement() {
                 GET_TOKEN()
                 DLL_DeleteBefore(&token_list);
             }
-            token_ptr prec_token = expression(&expression_list_if, 1, &stack_bst_tree);
+            token_ptr prec_token = expression(&expression_list_if, 1, &stack_bst_tree, T_OTHER);
             DLL_InsertBefore(&token_list, prec_token);
 
             CHECK_TYPE(T_K_THEN);
@@ -457,18 +483,18 @@ void statement() {
             Stack_Token *return_values = malloc(sizeof(Stack_Token));
             Stack_Token_Init(return_values);
 
-            return_list(return_values);
-
             global_bst_search(bst_tree_of_functions, nameActualFunction, &tmpData);
+
+            return_list(return_values);
 
             if(return_values->topIndex + 1 != tmpData->numOfReturns){
                 err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, Stack_Token_IsEmpty(return_values) ? NULL : return_values->array[0]);
             }
-            for (int i = tmpData->numOfReturns - 1; i > 0; i--) {
+            for (int i = tmpData->numOfReturns - 1; i >= 0; i--) {
                 if(return_values->array[return_values->topIndex]->type == T_ID){
                     LocalBSTNodePtr tmpValue;
                     bool isFound = false;
-                    for (int j = stack_bst_tree.topIndex; j <= 0 ; j--) {
+                    for (int j = stack_bst_tree.topIndex; j >= 0 ; j--) {
                         if(local_bst_search(stack_bst_tree.array[j], return_values->array[return_values->topIndex]->data->string->data, &tmpValue) == true){
                              isFound = true;
                              break;
@@ -509,7 +535,7 @@ void statement() {
                 GET_TOKEN()
                 DLL_DeleteBefore(&token_list);
             }
-            token_ptr prec_token1 = expression(&expression_list_while, 1, &stack_bst_tree);
+            token_ptr prec_token1 = expression(&expression_list_while, 1, &stack_bst_tree, T_OTHER);
             DLL_InsertBefore(&token_list, prec_token1);
 
             CHECK_TYPE(T_K_DO);
@@ -555,20 +581,20 @@ void param_next(functionPtrData functionData) {
     }
 }
 
-void entry_list_params(functionPtrData functionData) {
+void entry_list_params(functionPtrData functionData, functionPtrData tmpData) {
     if ((token->type == T_ID) || (token->type == T_INT) ||
         (token->type == T_DOUBLE) || (token->type == T_STRING) ||
         (token->type == T_STRLEN) || (token->type == T_LEFT_PAR) ||
         token->type == T_K_NIL) {
-        entry_param(functionData);
+        entry_param(functionData, tmpData);
         GET_TOKEN()
-        entry_param_next(functionData);
+        entry_param_next(functionData, tmpData);
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void entry_param(functionPtrData functionData) {
+void entry_param(functionPtrData functionData, functionPtrData tmpData) {
     if ((token->type == T_ID) && (token->next->type != T_EQL) &&
         (token->next->type != T_GT) && (token->next->type != T_GTE) &&
         (token->next->type != T_LT) && (token->next->type != T_LTE) &&
@@ -598,7 +624,7 @@ void entry_param(functionPtrData functionData) {
                 DLL_DeleteBefore(&token_list);
             }
         }
-        token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
+        token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, tmpData->paramsType[functionData->numOfParams]);
         DLL_InsertAfter(&token_list, prec_token);
         GET_TOKEN()
     }
@@ -607,13 +633,13 @@ void entry_param(functionPtrData functionData) {
     functionData->numOfParams++;
 }
 
-void entry_param_next(functionPtrData functionData) {
+void entry_param_next(functionPtrData functionData, functionPtrData tmpData) {
     if (token->type == T_COMMA) {
         GET_TOKEN()
-        entry_param(functionData);
+        entry_param(functionData, tmpData);
 
         GET_TOKEN()
-        entry_param_next(functionData);
+        entry_param_next(functionData, tmpData);
     } else {
         DLL_Previous(&token_list);
     }
@@ -659,7 +685,8 @@ void return_type_next(functionPtrData functionData) {
 void type_value() { IS_TYPE_VALUE(); }
 
 void return_list(Stack_Token *return_values) {
-    token_ptr token_Id = token;
+    token_ptr token_ID = token;
+
     if (token->type == T_ID || token->type == T_STRING || token->type == T_INT ||
         token->type == T_DOUBLE || token->type == T_STRLEN ||
         token->type == T_LEFT_PAR || token->type == T_K_NIL) {
@@ -673,15 +700,43 @@ void return_list(Stack_Token *return_values) {
             GET_TOKEN()
             if (token->type == T_LEFT_PAR) {
                 GET_TOKEN()
+
+                INIT_FUNCTION_DATA(tmpData)
+                if (global_bst_search(bst_tree_of_functions, token_ID->data->string->data, &tmpData) == false){
+                    err_call(ERR_SMNTIC_UNDEFINED_F, token_ID);
+                }
                 INIT_FUNCTION_DATA(functionData);
-                entry_list_params(functionData);
+                entry_list_params(functionData, tmpData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                INIT_FUNCTION_DATA(tmpData)
-                if(global_bst_search(bst_tree_of_functions, token_Id->data->string->data, &tmpData) == false){
-                    err_call(ERR_SMNTIC_UNDEFINED_F, token_Id);
+                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
+                if (strcmp(token_ID->data->string->data, "write") != 0) {
+                    CHECK_COUNT_OF_PARAMS()
+                    for (int i = 0; i < functionData->numOfParams; i++){
+                        LocalBSTNodePtr tmpValue;
+                        bool isFound = false;
+                        // Pokud je typ expression přeskočí se kontroly
+                        if (functionData->paramsType[i] == T_P_EXPRESSION){
+                            continue;
+                        }
+                        for (int j = stack_bst_tree.topIndex; j >= 0; j--) {
+                            if (local_bst_search(stack_bst_tree.array[j],
+                                                 functionData->params[i],
+                                                 &tmpValue) == true) {
+                                isFound = true;
+                                break;
+                            }
+                        }
+                        if (isFound == false) {
+                            err_call(ERR_SMNTIC_UNDEFINED_V, token_ID);
+                        }
+                        if(tmpValue->type != tmpData->paramsType[i] &&
+                           T_P_EXPRESSION != tmpData->paramsType[i]){
+                            err_call(ERR_SMNTIC_TYPE, token_ID);
+                        }
+                    }
                 }
 
                 for (int i = 0; i < tmpData->numOfReturns; i++) {
@@ -693,7 +748,7 @@ void return_list(Stack_Token *return_values) {
                 GET_TOKEN()
                 return_value_next(return_values);
             } else {
-                Stack_Token_Push(return_values,token_Id);
+                Stack_Token_Push(return_values,token_ID);
                 return_value_next(return_values);
             }
         } else {
@@ -718,7 +773,11 @@ void return_list(Stack_Token *return_values) {
                 }
             }
             GET_TOKEN()
-            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
+            // Hledani typu ktery se posle do expression
+            functionPtrData exp_type;
+            global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
+
+            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
             DLL_InsertBefore(&token_list, prec_token);
             Stack_Token_Push(return_values, prec_token);
             return_value_next(return_values);
@@ -738,20 +797,49 @@ void return_value_next(Stack_Token *return_values) {
             (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
             (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
             (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
-            token_ptr token_Id = token;
+            token_ptr token_ID = token;
             if (token->next->type == T_LEFT_PAR) {
                 GET_TOKEN()
                 CHECK_TYPE(T_LEFT_PAR);
                 GET_TOKEN()
+
+                INIT_FUNCTION_DATA(tmpData)
+                if (global_bst_search(bst_tree_of_functions, token_ID->data->string->data, &tmpData) == false){
+                    err_call(ERR_SMNTIC_UNDEFINED_F, token_ID);
+                }
+
                 INIT_FUNCTION_DATA(functionData);
-                entry_list_params(functionData);
+                entry_list_params(functionData, tmpData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                INIT_FUNCTION_DATA(tmpData)
-                if(global_bst_search(bst_tree_of_functions, token_Id->data->string->data, &tmpData) == false){
-                    err_call(ERR_SMNTIC_UNDEFINED_F, token_Id);
+                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
+                if (strcmp(token_ID->data->string->data, "write") != 0) {
+                    CHECK_COUNT_OF_PARAMS()
+                    for (int i = 0; i < functionData->numOfParams; i++){
+                        LocalBSTNodePtr tmpValue;
+                        bool isFound = false;
+                        // Pokud je typ expression přeskočí se kontroly
+                        if (functionData->paramsType[i] == T_P_EXPRESSION){
+                            continue;
+                        }
+                        for (int j = stack_bst_tree.topIndex; j >= 0; j--) {
+                            if (local_bst_search(stack_bst_tree.array[j],
+                                                 functionData->params[i],
+                                                 &tmpValue) == true) {
+                                isFound = true;
+                                break;
+                            }
+                        }
+                        if (isFound == false) {
+                            err_call(ERR_SMNTIC_UNDEFINED_V, token_ID);
+                        }
+                        if(tmpValue->type != tmpData->paramsType[i] &&
+                           T_P_EXPRESSION != tmpData->paramsType[i]){
+                            err_call(ERR_SMNTIC_TYPE, token_ID);
+                        }
+                    }
                 }
 
                 for (int i = 0; i < tmpData->numOfReturns; i++) {
@@ -764,7 +852,7 @@ void return_value_next(Stack_Token *return_values) {
                 return_value_next(return_values);
             } else {
                 GET_TOKEN()
-                Stack_Token_Push(return_values,token_Id);
+                Stack_Token_Push(return_values,token_ID);
                 return_value_next(return_values);
             }
         } else {
@@ -789,7 +877,12 @@ void return_value_next(Stack_Token *return_values) {
                 }
             }
             GET_TOKEN()
-            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
+
+            // Hledani typu ktery se posle do expression
+            functionPtrData exp_type;
+            global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
+
+            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
             DLL_InsertBefore(&token_list, prec_token);
             Stack_Token_Push(return_values, prec_token);
             return_value_next(return_values);
@@ -808,7 +901,7 @@ void state_else() {
     }
 }
 
-void init_value(bool isLocal, Stack_Token *stack_of_values) {
+void init_value(bool isLocal, Stack_Token *stack_of_values, Stack_Token *stack_of_ids) {
     if ((token->type == T_ID) || (token->type == T_INT) ||
         (token->type == T_DOUBLE) || (token->type == T_STRING) ||
         (token->type == T_STRLEN) || token->type == T_LEFT_PAR ||
@@ -833,7 +926,7 @@ void init_value(bool isLocal, Stack_Token *stack_of_values) {
                 CHECK_TYPE(T_LEFT_PAR);
 
                 GET_TOKEN()
-                entry_list_params(functionData);
+                entry_list_params(functionData, tmpData);
 
                 // Pokud se jedna o lokalni promennou musi mit pouze jednu navratovou hodnotu
                 if(isLocal){
@@ -892,26 +985,47 @@ void init_value(bool isLocal, Stack_Token *stack_of_values) {
                     DLL_DeleteBefore(&token_list);
                 }
             }
-            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
+
+            token_ptr prec_token;
+
+            // Pokud se jedna o lokalni deklaraci
+            if(isLocal){
+                prec_token = expression(&expression_list, 0, &stack_bst_tree, valueType);
+            } else{
+                // Hledani typu v ramcich
+                LocalBSTNodePtr tmpValue;
+                bool isFound = false;
+                for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
+                    if (local_bst_search(stack_bst_tree.array[i], stack_of_ids->array[stack_of_values->topIndex + 1]->data->string->data, &tmpValue) == true) {
+                        isFound = true;
+                        break;
+                    }
+                }
+                if (isFound == false) {
+                    err_call(ERR_SMNTIC_UNDEFINED_V, stack_of_ids->array[stack_of_values->topIndex + 1]);
+                }
+
+                prec_token = expression(&expression_list, 0, &stack_bst_tree, tmpValue->type);
+            }
+
             DLL_InsertAfter(&token_list, prec_token);
             GET_TOKEN()
             if(isLocal == false){
                 Stack_Token_Push(stack_of_values,prec_token);
             }
-            ;
         }
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void init_value_next(Stack_Token *stack_of_values) {
+void init_value_next(Stack_Token *stack_of_values, Stack_Token *stack_of_ids) {
     if (token->type == T_COMMA) {
         GET_TOKEN()
-        init_value(false, stack_of_values);
+        init_value(false, stack_of_values, stack_of_ids);
 
         GET_TOKEN()
-        init_value_next(stack_of_values);
+        init_value_next(stack_of_values, stack_of_ids);
     } else {
         DLL_Previous(&token_list);
     }
@@ -920,7 +1034,7 @@ void init_value_next(Stack_Token *stack_of_values) {
 void init_local_value() {
     if (token->type == T_ASSIGN) {
         GET_TOKEN()
-        init_value(true, NULL);
+        init_value(true, NULL, NULL);
     } else {
         DLL_Previous(&token_list);
     }

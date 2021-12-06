@@ -287,7 +287,7 @@ int operation(token_ptr operation){
 }
 
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst /*, token_type exp_type*/) {
+token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, token_type exp_type) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
     }
@@ -307,12 +307,11 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst /*
           default:
               break;
       }
-      /*
-      * if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
-       *  (prec_token->type != T_K_NUBMER || exp_type == T_K_NUMBER){
-      *      err_call(ERR_SMNTIC_EXPR, prec_token);
-      * }
-      */
+
+      if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
+        (prec_token->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
+           err_call(ERR_SMNTIC_EXPR, prec_token);
+      }
       char *tmp = string_postfix(prec_token);
       prec_token->type = T_P_EXPRESSION;
       prec_token->data->string->data = tmp;
@@ -550,12 +549,14 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst /*
     token_ptr res;
     Stack_Token_Top(sem_stack, &res);
     Stack_Token_Pop(sem_stack);
-    /*
-     * if(res->type != exp_type && (res->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
-       *  (res->type != T_K_NUBMER || exp_type == T_K_NUMBER){
-     *      err_call(ERR_SMNTIC_EXPR, res);
-     * }
-     */
+
+    if(exp_type != T_OTHER){
+        if(res->type != exp_type && (res->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
+           (res->type != T_K_NUMBER || exp_type == T_K_NUMBER))
+        {
+            err_call(ERR_SMNTIC_EXPR, res);
+        }
+    }
 
     token_ptr result = (token_ptr) malloc(sizeof (struct token));
     result->data =  malloc(sizeof(struct token_data));

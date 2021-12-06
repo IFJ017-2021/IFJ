@@ -152,14 +152,14 @@ void state_else();
  * 3) value_id <br>
  * @param ... ?
 */
-void init_value(bool isLocal, Stack_Token *stack_of_values);
+void init_value(bool isLocal, Stack_Token *stack_of_values, Stack_Token *stack_of_ids);
 
 /**
  * @brief Implementation of INIT_VALUE_NEXT rule. <br>
  * 1) , INIT_VALUE INIT_VALUE_NEXT <br>
  * @param ... ?
 */
-void init_value_next(Stack_Token *stack_of_values);
+void init_value_next(Stack_Token *stack_of_values, Stack_Token *stack_of_ids);
 
 /**
  * @brief Implementation of INIT_LOCAL_VALUE rule. <br>
