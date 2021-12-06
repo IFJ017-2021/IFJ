@@ -40,7 +40,7 @@ prec_table_actions precedence_table[TABLE_SIZE][TABLE_SIZE] = {
 
 token_ptr prec_token;
 DLList prec_token_list;
-Stack_Bst stack_bst_tree;
+Stack_Bst stack_bst_tree_exp;
 
 int number_in_table(token_ptr token_table, bool a) {
   if (a == 0) {
@@ -317,7 +317,7 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, t
       prec_token->data->string->data = tmp;
       return prec_token;
   }
-  stack_bst_tree = *stackBst;
+    stack_bst_tree_exp = *stackBst;
 
     prec_token_list = *list;
     DLL_First(&prec_token_list);
@@ -423,8 +423,8 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, t
                     LocalBSTNodePtr tmpValue;
                     bool isFound = false;
                     token_ptr tmp= (token_ptr) malloc(sizeof (struct token));
-                    for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
-                        if (local_bst_search(stack_bst_tree.array[i], expression_table[j]->data->string->data, &tmpValue) == true) {
+                    for (int i = stack_bst_tree_exp.topIndex; i >= 0; i--) {
+                        if (local_bst_search(stack_bst_tree_exp.array[i], expression_table[j]->data->string->data, &tmpValue) == true) {
                             tmp->type = tmpValue->type;
                             isFound = true;
                             break;
