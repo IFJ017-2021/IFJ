@@ -10,7 +10,7 @@
 #include "prec_table.h"
 #include "error.h"
 #include "parser.h"
-#include "stack.c"
+#include "stack.h"
 #include <stdlib.h>
 #include <string.h>
 
@@ -211,13 +211,12 @@ char *string_postfix(token_ptr string_token){
             sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_K_STRING:;
-//            string *b = malloc(sizeof(string));
-//            strInit(b);
-//            strAppendChar(b, '\'');
-//            strAppendStr(b, string_token->data->string->data);
-//            strAppendChar(b, '\'');
-//            return b->data;
-            return string_token->data->string->data;
+            string *b = malloc(sizeof(string));
+            strInit(b);
+            strAppendStr(b, "'");
+            strAppendStr(b, string_token->data->string->data);
+            strAppendStr(b, "'");
+            return b->data;
         case T_K_NUMBER:;
             count = snprintf(NULL, 0, "%i", string_token->data->integer);
             a = malloc(sizeof(char) * (count + 1));

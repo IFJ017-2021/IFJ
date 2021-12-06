@@ -1,8 +1,12 @@
 -- Program 1: Vypocet faktorialu (iterativne)
 require "ifj21"
 
+global foo : function (integer) : integer
+
 function main() -- uzivatelska funkce bez parametru
-  local a : string
+  local b : string
+  local a : integer = foo(b)
+
   local vysl : string = 0
   vysl = #("ahoj svete" .. "a") + a
   write("Zadejte cislo pro vypocet faktorialu\n")

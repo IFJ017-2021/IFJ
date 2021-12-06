@@ -10,7 +10,7 @@
 
 #include "parser.h"
 #include "error.h"
-#include "symtable.c"
+#include "symtable.h"
 #include "tokenList.h"
 #include "scanner.h"
 #include "prec_table.h"
@@ -323,6 +323,7 @@ void statement() {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
+                // TODO zkontrolovat typy
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
                 }

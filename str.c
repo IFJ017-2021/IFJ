@@ -72,11 +72,13 @@ int strAppendChar(string *s1, char toAppend){
  */
 int strAppendStr(string *s1, const char *toAppendStr){
     int const_string_length = (int) strlen(toAppendStr);
-
     if(s1->length + const_string_length + 1 >= s1->capacity){ // If we can't fit needed string to the string that is already made
         int new_capacity = s1->length + const_string_length + 1;
-        if(s1->data != (char *) realloc(s1->data, sizeof(char) * new_capacity)){ // Realloc not successful
+        char* ptr = (char *) realloc(s1->data,  new_capacity);
+        if(ptr  == NULL){
             return STR_ERR;
+        } else{
+            s1->data = ptr;
         }
         s1->capacity = new_capacity; // Allocate new capacity
     }
