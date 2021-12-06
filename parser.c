@@ -2,7 +2,7 @@
  *  Project: Implementation of imperative language compiler IFJ21
  *  @file parser.h
  *
- *  @brief Header file for parser.c (Syntax and semantic  analyzer).
+ *  @brief Header file for parser.c (Syntax and semantic analyzer).
  *
  *  @author <xpoliv06> Tomáš Polívka
  *  @author <xhajek51> Vojtěch Hájek
@@ -138,6 +138,7 @@ GlobalBSTNodePtr bst_tree_of_functions;
 DLList token_list;
 token_ptr token;
 char *valueId;
+char *nameActualFunction;
 token_type valueType;
 
 void start(DLList *testlist) {
@@ -179,6 +180,10 @@ void main_list() {
             CHECK_TYPE(T_ID);
 
             token_ID = token;
+            // Ulozeni nazvu funkce pro konrolu pravilda RETURN_LIST
+            nameActualFunction = malloc(sizeof(char) * strlen(token->data->string->data));
+            strcpy(nameActualFunction, token->data->string->data);
+
             // Malloc a přiřazení klíče do functionData, následně kontrola zda se již název funkce nachází ve stromě
             bool isDefined = false;
             functionData->key = malloc(sizeof(char) * strlen(token->data->string->data));
@@ -447,7 +452,43 @@ void statement() {
             break;
         case T_K_RETURN:
             GET_TOKEN()
-            return_list();
+
+            Stack_Token *return_values = malloc(sizeof(Stack_Token));
+            Stack_Token_Init(return_values);
+
+            return_list(return_values);
+
+            global_bst_search(bst_tree_of_functions, nameActualFunction, &tmpData);
+
+            if(return_values->topIndex + 1 != tmpData->numOfReturns){
+                err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, Stack_Token_IsEmpty(return_values) ? NULL : return_values->array[0]);
+            }
+            for (int i = tmpData->numOfReturns - 1; i > 0; i--) {
+                if(return_values->array[return_values->topIndex]->type == T_ID){
+                    LocalBSTNodePtr tmpValue;
+                    bool isFound = false;
+                    for (int j = stack_bst_tree.topIndex; j <= 0 ; j--) {
+                        if(local_bst_search(stack_bst_tree.array[j], return_values->array[return_values->topIndex]->data->string->data, &tmpValue) == true){
+                             isFound = true;
+                             break;
+                        }
+                    }
+                    if(isFound == false){
+                        err_call(ERR_SMNTIC_UNDEFINED_V, return_values->array[return_values->topIndex]);
+                    }
+                    if(tmpValue->type != tmpData->returnsType[i]){
+                        err_call(ERR_SMNTIC_RETURN_PARAMS_TYPE, return_values->array[return_values->topIndex]);
+                    }
+
+                }
+                else{
+                    if(return_values->array[return_values->topIndex]->type != tmpData->returnsType[i] &&
+                            return_values->array[return_values->topIndex]->type != T_P_EXPRESSION){
+                        err_call(ERR_SMNTIC_RETURN_PARAMS_TYPE, Stack_Token_IsEmpty(return_values) ? NULL : return_values->array[0]);
+                    }
+                }
+                Stack_Token_Pop(return_values);
+            }
 
             GET_TOKEN()
             statement();
@@ -616,7 +657,8 @@ void return_type_next(functionPtrData functionData) {
 
 void type_value() { IS_TYPE_VALUE(); }
 
-void return_list(functionPtrData functionData) {
+void return_list(Stack_Token *return_values) {
+    token_ptr token_Id = token;
     if (token->type == T_ID || token->type == T_STRING || token->type == T_INT ||
         token->type == T_DOUBLE || token->type == T_STRLEN ||
         token->type == T_LEFT_PAR || token->type == T_K_NIL) {
@@ -630,15 +672,28 @@ void return_list(functionPtrData functionData) {
             GET_TOKEN()
             if (token->type == T_LEFT_PAR) {
                 GET_TOKEN()
+                INIT_FUNCTION_DATA(functionData);
                 entry_list_params(functionData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
+                INIT_FUNCTION_DATA(tmpData)
+                if(global_bst_search(bst_tree_of_functions, token_Id->data->string->data, &tmpData) == false){
+                    err_call(ERR_SMNTIC_UNDEFINED_F, token_Id);
+                }
+
+                for (int i = 0; i < tmpData->numOfReturns; i++) {
+                    INIT_TOKEN_POINTER()
+                    tmp->type = tmpData->returnsType[i];
+                    Stack_Token_Push(return_values,tmp);
+                }
+
                 GET_TOKEN()
-                return_value_next();
+                return_value_next(return_values);
             } else {
-                return_value_next();
+                Stack_Token_Push(return_values,token_Id);
+                return_value_next(return_values);
             }
         } else {
             DLList expression_list;
@@ -664,15 +719,15 @@ void return_list(functionPtrData functionData) {
             GET_TOKEN()
             token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token);
-
-            return_value_next();
+            Stack_Token_Push(return_values, prec_token);
+            return_value_next(return_values);
         }
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void return_value_next(functionPtrData functionData) {
+void return_value_next(Stack_Token *return_values) {
     if (token->type == T_COMMA) {
         GET_TOKEN()
         if ((token->type == T_ID) && (token->next->type != T_EQL) &&
@@ -682,21 +737,34 @@ void return_value_next(functionPtrData functionData) {
             (token->next->type != T_SUB) && (token->next->type != T_ADD) &&
             (token->next->type != T_DIV) && (token->next->type != T_IDIV) &&
             (token->next->type != T_STRLEN) && (token->next->type != T_CONCAT)) {
+            token_ptr token_Id = token;
             if (token->next->type == T_LEFT_PAR) {
                 GET_TOKEN()
                 CHECK_TYPE(T_LEFT_PAR);
-
                 GET_TOKEN()
+                INIT_FUNCTION_DATA(functionData);
                 entry_list_params(functionData);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
+                INIT_FUNCTION_DATA(tmpData)
+                if(global_bst_search(bst_tree_of_functions, token_Id->data->string->data, &tmpData) == false){
+                    err_call(ERR_SMNTIC_UNDEFINED_F, token_Id);
+                }
+
+                for (int i = 0; i < tmpData->numOfReturns; i++) {
+                    INIT_TOKEN_POINTER()
+                    tmp->type = tmpData->returnsType[i];
+                    Stack_Token_Push(return_values,tmp);
+                }
+
                 GET_TOKEN()
-                return_value_next(functionData);
+                return_value_next(return_values);
             } else {
                 GET_TOKEN()
-                return_value_next(functionData);
+                Stack_Token_Push(return_values,token_Id);
+                return_value_next(return_values);
             }
         } else {
             DLList expression_list;
@@ -722,8 +790,8 @@ void return_value_next(functionPtrData functionData) {
             GET_TOKEN()
             token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertBefore(&token_list, prec_token);
-
-            return_value_next(functionData);
+            Stack_Token_Push(return_values, prec_token);
+            return_value_next(return_values);
         }
     } else {
         DLL_Previous(&token_list);

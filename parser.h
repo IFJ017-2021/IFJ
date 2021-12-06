@@ -129,14 +129,14 @@ void type_value();
  * 2) value_id RETURN_VALUE_NEXT<br>
  * @param ... ?
 */
-void return_list();
+void return_list(Stack_Token *return_values);
 
 /**
  * @brief Implementation of RETURN_LIST rule. <br>
  * 1) , value_id RETURN_VALUE_NEXT <br>
  * @param ... ?
 */
-void return_value_next();
+void return_value_next(Stack_Token *return_values);
 
 /**
  * @brief Implementation of STATE_ELSE rule. <br>
