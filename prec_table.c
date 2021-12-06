@@ -307,10 +307,11 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, t
           default:
               break;
       }
-
-      if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
-        (prec_token->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
-           err_call(ERR_SMNTIC_EXPR, prec_token);
+      if (exp_type != T_OTHER){
+          if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
+             (prec_token->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
+              err_call(ERR_SMNTIC_EXPR, prec_token);
+          }
       }
       char *tmp = string_postfix(prec_token);
       prec_token->type = T_P_EXPRESSION;
