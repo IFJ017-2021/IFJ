@@ -36,7 +36,8 @@ void err_call(int error, token_ptr token) {
             fprintf(stderr, "ERR 5 - Semantic error (wrong number / type of parameters or return values when calling a function or returning from a function");
             break;
         case ERR_SMNTIC_EXPR:
-            fprintf(stderr, "ERR 6 - Semantic error (type incompatibility in arithmetic, string or relational expressions)");
+            fprintf(stderr, "ERR 6 - Semantic error (type incompatibility in arithmetic, string or relational expressions) \n");
+            fprintf(stderr, "Trying to assign another data type on line %d, near the colum %d\n", token->line_num, token->col_num);
             break;
         case ERR_SMNTIC_OTHER:
             fprintf(stderr, "ERR 7 - Semantic error (other)");

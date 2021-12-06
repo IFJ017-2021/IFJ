@@ -1,31 +1,25 @@
+-- Program 1: Vypocet faktorialu (iterativne)
 require "ifj21"
 
-function main()
-
-    local n:integer = (5 + a) * (5 + b) / 8
-
-    if (x+a) == nil then
-        write("yes\n")
-    else
-        write("no\n")
+function main() -- uzivatelska funkce bez parametru
+  local a : string
+  local vysl : string = 0
+  vysl = #("ahoj svete" .. "a") + a
+  write("Zadejte cislo pro vypocet faktorialu\n")
+  a = readi()
+  if a == nil then
+      write("a je nil\n") return
+  else
+  end
+  if a < 0 then
+    write("Faktorial nelze spocitat\n")
+  else
+    vysl = 1
+    while a > 0 do
+       a = a - 1  -- dva prikazy
     end
-
-    if y == nil then
-        write("yes\n")
-    else
-        write("no\n")
-    end
-
-    if z == nil then
-        write("yes\n")
-    else
-        write("no\n")
-    end
-
-    if n == nil then
-        write("yes\n")
-    else
-        write("no\n")
-    end
+    write("Vysledek je: ", vysl, "\n")
+  end
 end
-main()
+
+main()  -- prikaz hlavniho tela programu

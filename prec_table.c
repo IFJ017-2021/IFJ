@@ -204,14 +204,21 @@ char *string_postfix(token_ptr string_token){
     switch (string_token->type) {
         case T_ID:
             return string_token->data->string->data;
-        case T_INT:;
+            break;
+        case T_K_INTEGER:;
             count = snprintf(NULL, 0, "%i", string_token->data->integer);
             a = malloc(sizeof(char) * (count + 1));
             sprintf(a, "%d", string_token->data->integer);
             return a;
-        case T_STRING:
+        case T_K_STRING:;
+//            string *b = malloc(sizeof(string));
+//            strInit(b);
+//            strAppendChar(b, '\'');
+//            strAppendStr(b, string_token->data->string->data);
+//            strAppendChar(b, '\'');
+//            return b->data;
             return string_token->data->string->data;
-        case T_DOUBLE:;
+        case T_K_NUMBER:;
             count = snprintf(NULL, 0, "%i", string_token->data->integer);
             a = malloc(sizeof(char) * (count + 1));
             sprintf(a, "%d", string_token->data->integer);
@@ -253,26 +260,60 @@ char *string_postfix(token_ptr string_token){
             return a;
     }
 }
-/*
-int valid_operation(Stack_Token stack, token_ptr operation){
+
+int operation(token_ptr operation){
     switch (operation->type) {
         case T_ADD:
         case T_SUB:
         case T_MUL:
+            return 0;
         case T_DIV:
+            return 1;
         case T_IDIV:
-
+            return 2;
+        case T_LT:
+        case T_GT:
+        case T_LTE:
+        case T_GTE:
+        case T_NEQL:
+        case T_EQL:
+            return 3;
+        case T_STRLEN:
+            return 4;
+        case T_CONCAT:
+            return 5;
+        default:
+            return -1;
     }
 }
-*/
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst) {
+
+token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst /*, token_type exp_type*/) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
     }
   if (list->first->next == NULL) {
       DLL_First(list);
       DLL_GetFirst(list, &prec_token);
+      switch(prec_token->type) {
+          case T_INT:
+              prec_token->type = T_K_INTEGER;
+              break;
+          case T_DOUBLE:
+              prec_token->type = T_K_NUMBER;
+              break;
+          case T_STRING:
+              prec_token->type = T_K_STRING;
+              break;
+          default:
+              break;
+      }
+      /*
+      * if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
+       *  (prec_token->type != T_K_NUBMER || exp_type == T_K_NUMBER){
+      *      err_call(ERR_SMNTIC_EXPR, prec_token);
+      * }
+      */
       char *tmp = string_postfix(prec_token);
       prec_token->type = T_P_EXPRESSION;
       prec_token->data->string->data = tmp;
@@ -369,28 +410,153 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst) {
     }
     Stack_Token_Pop(stack_sym);
 
-    // TODO sémantika
     Stack_Token *sem_stack = (Stack_Token * )malloc(sizeof (Stack_Token));
     Stack_Token_Init(sem_stack);
-    int j = 0;
-    while (expression_table[j]->type != T_ADD){
-        if(expression_table[j]->type == T_ID){
-            LocalBSTNodePtr tmpValue;
-            bool isFound = false;
-            for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
-                if (local_bst_search(stack_bst_tree.array[i], expression_table[j]->data->string->data, &tmpValue) == true) {
-                    isFound = true;
+    int state = 0;
+    for (int j = 0; j < count;) {
+        switch (state) {
+            case 0:
+                if(expression_table[j]->type != T_INT && expression_table[j]->type != T_DOUBLE &&
+                   expression_table[j]->type != T_STRING && expression_table[j]->type != T_K_NIL &&
+                   expression_table[j]->type != T_ID){
+                    state = 1;break;
+                }
+                if(expression_table[j]->type == T_ID){
+                    LocalBSTNodePtr tmpValue;
+                    bool isFound = false;
+                    token_ptr tmp= (token_ptr) malloc(sizeof (struct token));
+                    for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
+                        if (local_bst_search(stack_bst_tree.array[i], expression_table[j]->data->string->data, &tmpValue) == true) {
+                            tmp->type = tmpValue->type;
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (isFound == false) {
+                        err_call(ERR_SMNTIC_UNDEFINED_V, expression_table[j]);
+                    }
+                    Stack_Token_Push(sem_stack, tmp);
+                }
+                switch (expression_table[j]->type) {
+                    case T_INT:
+                        expression_table[j]->type = T_K_INTEGER;
+                        Stack_Token_Push(sem_stack, expression_table[j]);
+                        break;
+                    case T_DOUBLE:
+                        expression_table[j]->type = T_K_NUMBER;
+                        Stack_Token_Push(sem_stack, expression_table[j]);
+                        break;
+                    case T_STRING:
+                        expression_table[j]->type = T_K_STRING;
+                        Stack_Token_Push(sem_stack, expression_table[j]);
+                        break;
+                    case T_K_NIL:
+                        Stack_Token_Push(sem_stack, expression_table[j]);
+                        break;
+                    default:
+                        break;
+                }
+                j++;
+                break;
+            case 1:;
+                int op = operation(expression_table[j]);
+                if(op != 4){
+                    token_ptr tmp1;
+                    Stack_Token_Top(sem_stack, &tmp1);
+                    Stack_Token_Pop(sem_stack);
+
+                    token_ptr tmp2;
+                    Stack_Token_Top(sem_stack, &tmp2);
+                    Stack_Token_Pop(sem_stack);
+
+                    token_ptr tmp = (token_ptr) malloc(sizeof (struct token));
+                    if(op == 0){
+                        if((tmp1->type != T_K_INTEGER && tmp1->type != T_K_NUMBER) ||
+                           (tmp2->type != T_K_INTEGER && tmp2->type != T_K_NUMBER)){
+                            err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                        }
+                        if(tmp1->type != tmp2->type){
+                            tmp->type = T_K_NUMBER;
+                            Stack_Token_Push(sem_stack, tmp);
+                        }
+                        if(tmp1->type == T_K_INTEGER && tmp2->type == T_K_INTEGER){
+                            tmp->type = T_K_INTEGER;
+                            Stack_Token_Push(sem_stack, tmp);
+                        }
+                        if(tmp1->type == T_K_NUMBER && tmp2->type == T_K_NUMBER){
+                            tmp->type = T_K_NUMBER;
+                            Stack_Token_Push(sem_stack, tmp);
+                        }
+                        j++;
+                        state = 0;
+                        break;
+                    }
+                    if(op == 1){
+                        if((tmp1->type != T_K_INTEGER && tmp1->type != T_K_NUMBER) ||
+                           (tmp2->type != T_K_INTEGER && tmp2->type != T_K_NUMBER)){
+                            err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                        }
+                        tmp->type = T_K_NUMBER;
+                        Stack_Token_Push(sem_stack, tmp);
+                        j++;
+                        state = 0;
+                        break;
+                    }
+                    if(op == 2){
+                        if(tmp1->type != T_K_INTEGER || tmp2->type != T_K_INTEGER){
+                            err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                        }
+                        tmp->type = T_K_INTEGER;
+                        Stack_Token_Push(sem_stack, tmp);
+                        j++;
+                        state = 0;
+                        break;
+                    }
+                    if(op == 3) {
+                        tmp->type = T_K_INTEGER;
+                        Stack_Token_Push(sem_stack, tmp);
+                        j++;
+                        state = 0;
+                        break;
+                    }
+                    if(op == 5){
+                        if(tmp1->type != T_K_STRING || tmp2->type != T_K_STRING){
+                            err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                        }
+                        tmp->type = T_K_STRING;
+                        Stack_Token_Push(sem_stack, tmp);
+                        j++;
+                        state = 0;
+                        break;
+                    }
+                }
+                if(op == 4){
+                    token_ptr tmp;
+                    Stack_Token_Top(sem_stack, &tmp);
+                    Stack_Token_Pop(sem_stack);
+
+                    if(tmp->type != T_K_STRING){
+                        err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                    }
+                    token_ptr tmp1 = (token_ptr) malloc(sizeof (struct token));
+                    tmp1->type = T_K_INTEGER;
+                    Stack_Token_Push(sem_stack, tmp1);
+                    j++;
+                    state = 0;
                     break;
                 }
-            }
-            if (isFound == false) {
-                err_call(ERR_SMNTIC_UNDEFINED_V, expression_table[j]);
-            }
+                break;
         }
-        Stack_Token_Push(sem_stack, expression_table[j]);
-        j++;
     }
-   // valid_operation(sem_stack, expression_table[j]);
+    token_ptr res;
+    Stack_Token_Top(sem_stack, &res);
+    Stack_Token_Pop(sem_stack);
+    /*
+     * if(res->type != exp_type && (res->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
+       *  (res->type != T_K_NUBMER || exp_type == T_K_NUMBER){
+     *      err_call(ERR_SMNTIC_EXPR, res);
+     * }
+     */
 
     token_ptr result = (token_ptr) malloc(sizeof (struct token));
     result->data =  malloc(sizeof(struct token_data));
