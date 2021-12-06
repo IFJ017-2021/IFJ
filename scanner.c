@@ -26,8 +26,8 @@ int get_token_list(DLList *list) {
       // TODO destroy list
       return ERR_LEX;
     }
-    if(new->type != T_OTHER && new->type != T_EOL) {
-        DLL_InsertLast(list, new);
+    if (new->type != T_OTHER &&new->type != T_EOL) {
+      DLL_InsertLast(list, new);
     }
   }
 
@@ -59,7 +59,6 @@ int get_single_token(token_ptr *insert_into) {
   if ((*insert_into)->type == T_ID)
     is_token_keyword(insert_into);
 
-  print_single_token(*insert_into);
   return 0;
 }
 

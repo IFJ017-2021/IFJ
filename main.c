@@ -34,14 +34,12 @@ int main(int argc, char *argv[]) {
   int lex_return = get_token_list(&token_list);
 
   if (lex_return == 0) {
-//    print_token_list(&token_list);
+    // print_token_list(&token_list);
     // Zavolani syntakticke analyzy
     start(&token_list);
   } else {
     err_call(ERR_LEX, NULL);
   }
-
-  fprintf(stdout, "%s", "Proslo to");
 
   return 0;
 }
