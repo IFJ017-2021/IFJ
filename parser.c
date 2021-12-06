@@ -120,6 +120,19 @@
             }                                                                               \
         }
 
+#define FIND_VALUE_IN_STACK()                                                                               \
+        LocalBSTNodePtr tmpValue;                                                                           \
+        bool isFound = false;                                                                               \
+        for (int i = stack_bst_tree.topIndex; i >= 0; i--) {                                                \
+        if (local_bst_search(stack_bst_tree.array[i], token->data->string->data, &tmpValue) == true) {      \
+                isFound = true;                                                                             \
+                break;                                                                                      \
+            }                                                                                               \
+        }                                                                                                   \
+        if (isFound == false) {                                                                             \
+            err_call(ERR_SMNTIC_UNDEFINED_V, token);                                                        \
+        }
+
 Stack_Bst stack_bst_tree;
 GlobalBSTNodePtr bst_tree_of_functions;
 DLList token_list;
@@ -196,18 +209,18 @@ void main_list() {
             GET_TOKEN()
             return_list_of_types(functionData);
 
-            GET_TOKEN()
-            statement();
-
-            GET_TOKEN()
-            CHECK_TYPE(T_K_END);
-
             if (isDefined) {
                 CHECK_COUNT_AND_TYPES_OF_PARAMS()
                 CHECK_COUNT_AND_TYPES_OF_RETURN_PARAMS()
             } else {
                 global_bst_insert(&bst_tree_of_functions, functionData->key, functionData);
             }
+
+            GET_TOKEN()
+            statement();
+
+            GET_TOKEN()
+            CHECK_TYPE(T_K_END);
 
             Stack_Bst_Pop(&stack_bst_tree);
 
@@ -289,6 +302,7 @@ void statement() {
     functionPtrData functionData = (functionPtrData) malloc(sizeof(struct functionData));
     functionPtrData tmpData;
     token_ptr token_ID;
+    LocalBSTNodePtr localFrame;
     switch (token->type) {
         case T_ID:
             if (token->next->type == T_LEFT_PAR) {
@@ -311,17 +325,55 @@ void statement() {
                 GET_TOKEN()
                 statement();
             } else {
-                GET_TOKEN();
-                value_id_next();
+                Stack_Token *stack_of_ids= malloc(sizeof(Stack_Token));
+                Stack_Token_Init(stack_of_ids);
+                Stack_Token_Push(stack_of_ids, token);
+                GET_TOKEN()
+                value_id_next(stack_of_ids);
 
                 GET_TOKEN()
                 CHECK_TYPE(T_ASSIGN);
 
+                Stack_Token *stack_of_values = malloc(sizeof(Stack_Token));
+                Stack_Token_Init(stack_of_values);
                 GET_TOKEN()
-                init_value();
+                init_value(false, stack_of_values);
 
                 GET_TOKEN()
-                init_value_next();
+                init_value_next(stack_of_values);
+
+                // Kotrola počtu přiřazených hodnot a jednotlivých typů
+                if(stack_of_ids->topIndex != stack_of_values->topIndex){
+                    while(!Stack_Token_IsEmpty(stack_of_ids)){
+                        Stack_Token_Pop(stack_of_ids);
+                    }
+                    while(!Stack_Token_IsEmpty(stack_of_values)){
+                        Stack_Token_Pop(stack_of_values);
+                    }
+                    err_call(ERR_SMNTIC_NUMBER_OF_PARAMS, stack_of_ids->array[0]);
+                }
+
+                while (stack_of_ids->topIndex >= 0) {
+                    LocalBSTNodePtr tmpValue;
+                    bool isFound = false;
+                    for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
+                        if (local_bst_search(stack_bst_tree.array[i],
+                                             stack_of_ids->array[stack_of_ids->topIndex]->data->string->data,
+                                             &tmpValue) == true) {
+                            isFound = true;
+                            break;
+                        }
+                    }
+                    if (isFound == false) {
+                        err_call(ERR_SMNTIC_UNDEFINED_V, stack_of_ids->array[0]);
+                    }
+                    if(tmpValue->type != stack_of_values->array[stack_of_values->topIndex]->type &&
+                    T_P_EXPRESSION != stack_of_values->array[stack_of_values->topIndex]->type){
+                        err_call(ERR_SMNTIC_TYPE, stack_of_ids->array[0]);
+                    }
+                    Stack_Token_Pop(stack_of_ids);
+                    Stack_Token_Pop(stack_of_values);
+                }
 
                 GET_TOKEN()
                 statement();
@@ -374,8 +426,7 @@ void statement() {
 
             CHECK_TYPE(T_K_THEN);
 
-            // Save list of params to local frame
-            LocalBSTNodePtr localFrame;
+            localFrame;
             local_bst_init(&localFrame);
             // Push tree (local frame) to stack
             Stack_Bst_Push(&stack_bst_tree, localFrame);
@@ -421,11 +472,18 @@ void statement() {
 
             CHECK_TYPE(T_K_DO);
 
+            localFrame;
+            local_bst_init(&localFrame);
+            // Push tree (local frame) to stack
+            Stack_Bst_Push(&stack_bst_tree, localFrame);
+
             GET_TOKEN()
             statement();
 
             GET_TOKEN()
             CHECK_TYPE(T_K_END);
+
+            Stack_Bst_Pop(&stack_bst_tree);
 
             GET_TOKEN()
             statement();
@@ -681,7 +739,7 @@ void state_else() {
     }
 }
 
-void init_value() {
+void init_value(bool isLocal, Stack_Token *stack_of_values) {
     if ((token->type == T_ID) || (token->type == T_INT) ||
         (token->type == T_DOUBLE) || (token->type == T_STRING) ||
         (token->type == T_STRLEN) || token->type == T_LEFT_PAR ||
@@ -708,6 +766,22 @@ void init_value() {
                 GET_TOKEN()
                 entry_list_params(functionData);
 
+                // Pokud se jedna o lokalni promennou musi mit pouze jednu navratovou hodnotu
+                if(isLocal){
+                    if(tmpData->numOfReturns != 1){
+                        err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, token_ID);
+                    }
+                    if (valueType != tmpData->returnsType[0]){
+                        err_call(ERR_SMNTIC_TYPE, token_ID);
+                    }
+                } else{
+                    for (int i = 0; i < tmpData->numOfReturns; i++) {
+                        INIT_TOKEN_POINTER()
+                        tmp->type = tmpData->returnsType[i];
+                        Stack_Token_Push(stack_of_values,tmp);
+                    }
+                }
+
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
                 }
@@ -715,22 +789,18 @@ void init_value() {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
             } else {
-
-                LocalBSTNodePtr tmpValue;
-                bool isFound = false;
-                for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
-                    if (local_bst_search(stack_bst_tree.array[i], token->data->string->data, &tmpValue) == true) {
-                        isFound = true;
-                        break;
+                FIND_VALUE_IN_STACK()
+                if(isLocal == true){
+                    if (valueType != tmpValue->type) {
+                        err_call(ERR_SMNTIC_TYPE, token);
                     }
-                }
-                if (isFound == false) {
-                    err_call(ERR_SMNTIC_UNDEFINED_V, token);
+                } else{
+                    INIT_TOKEN_POINTER()
+                    tmp->type = tmpValue->type;
+                    Stack_Token_Push(stack_of_values,tmp);
                 }
 
-                if (valueType != tmpValue->type) {
-                    err_call(ERR_SMNTIC_TYPE, token);
-                }
+
             }
         } else {
             DLList expression_list;
@@ -756,19 +826,23 @@ void init_value() {
             token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree);
             DLL_InsertAfter(&token_list, prec_token);
             GET_TOKEN()
+            if(isLocal == false){
+                Stack_Token_Push(stack_of_values,prec_token);
+            }
+            ;
         }
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void init_value_next() {
+void init_value_next(Stack_Token *stack_of_values) {
     if (token->type == T_COMMA) {
         GET_TOKEN()
-        init_value();
+        init_value(false, stack_of_values);
 
         GET_TOKEN()
-        init_value_next();
+        init_value_next(stack_of_values);
     } else {
         DLL_Previous(&token_list);
     }
@@ -777,19 +851,21 @@ void init_value_next() {
 void init_local_value() {
     if (token->type == T_ASSIGN) {
         GET_TOKEN()
-        init_value();
+        init_value(true, NULL);
     } else {
         DLL_Previous(&token_list);
     }
 }
 
-void value_id_next() {
+void value_id_next(Stack_Token *stack_of_ids) {
     if (token->type == T_COMMA) {
         GET_TOKEN()
         CHECK_TYPE(T_ID);
 
+        Stack_Token_Push(stack_of_ids, token);
+
         GET_TOKEN()
-        value_id_next();
+        value_id_next(stack_of_ids);
     } else {
         DLL_Previous(&token_list);
     }
