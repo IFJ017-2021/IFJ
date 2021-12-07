@@ -212,6 +212,12 @@ char *string_postfix(token_ptr string_token){
             sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_K_STRING:;
+            for (int i = 0; i <= (int)strlen(string_token->data->string->data); i++) {
+                int currentAsciiVal = (int)string_token->data->string->data[i];
+                if (currentAsciiVal == 32) {
+                    string_token->data->string->data[i] = (char)'\\032';
+                }
+            }
             string *b = malloc(sizeof(string));
             strInit(b);
             strAppendStr(b, "'");
