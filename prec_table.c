@@ -525,6 +525,10 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
                         break;
                     }
                     if(op == 3) {
+                        if(tmp1->type != tmp2->type && (tmp1->type != T_K_INTEGER || tmp2->type != T_K_NUMBER) &&
+                        (tmp1->type != T_K_NUMBER || tmp2->type != T_K_INTEGER)){
+                            err_call(ERR_SMNTIC_EXPR, expression_table[j]);
+                        }
                         tmp->type = T_K_INTEGER;
                         Stack_Token_Push(sem_stack, tmp);
                         j++;
