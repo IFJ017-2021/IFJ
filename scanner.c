@@ -231,8 +231,7 @@ int lex_fsm(token_ptr *token) {
 
     case S_COMMENT0:
       if (current == '\n' || current == EOF) {
-        ungetc(current, stdin);
-        nstate = S_START;
+        nstate = S_ERR;
       } else if (current == '[')
         nstate = S_COMMENT1;
       else
@@ -241,8 +240,7 @@ int lex_fsm(token_ptr *token) {
 
     case S_COMMENT1:
       if (current == '\n' || current == EOF) {
-        ungetc(current, stdin);
-        nstate = S_START;
+        nstate = S_ERR;
       } else if (current == '[')
         nstate = S_COMMENT2;
       else
@@ -251,8 +249,7 @@ int lex_fsm(token_ptr *token) {
 
     case S_COMMENT2:
       if (current == EOF) {
-        ungetc(current, stdin);
-        nstate = S_START;
+        nstate = S_ERR;
       } else if (current == ']')
         nstate = S_COMMENT3;
       else
@@ -261,8 +258,7 @@ int lex_fsm(token_ptr *token) {
 
     case S_COMMENT3:
       if (current == EOF) {
-        ungetc(current, stdin);
-        nstate = S_START;
+        nstate = S_ERR;
       } else if (current == ']')
         nstate = S_START;
       else
