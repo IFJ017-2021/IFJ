@@ -103,7 +103,7 @@ int strCopyConstant(string *s1, char *c){
 
 void asciiConvert(char *s) {
   printf("string@");
-  for (int i = 0; i <= (int)strlen(s); i++) {
+  for (int i = 0; i <= (int)strlen(s) - 1; i++) {
     int currentAsciiVal = (int)s[i];
     if (currentAsciiVal < 32 && currentAsciiVal > 0) {
       printf("\\%03d", currentAsciiVal);

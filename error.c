@@ -16,8 +16,8 @@
 void err_call(int error, token_ptr token) {
     switch (error) {
         case ERR_LEX:
-            fprintf(stderr, "ERR 1 - Lexical error");
-            break;
+          fprintf(stderr, "ERR 1 - Lexical error\n");
+          break;
         case ERR_SYNTAX:
             fprintf(stderr, "ERR 2 - Syntax error");
             if (token != NULL)
