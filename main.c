@@ -35,7 +35,7 @@ int main(int argc, char *argv[]) {
   int lex_return = get_token_list(&token_list);
 
   if (lex_return == 0) {
-    // Zavolani syntakticke analyzy
+    // Calling syntax analysis
     start(&token_list);
   } else {
     err_call(ERR_LEX, NULL);
