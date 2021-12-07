@@ -2,7 +2,7 @@
  *  Project: Implementation of imperative language compiler IFJ21
  *  @file symtable.c
  *
- *  @brief // TODO :)
+ *  @brief File that implements symbol table using BST
  *
  *  @author <xpoliv06> Tomáš Polívka
  */
