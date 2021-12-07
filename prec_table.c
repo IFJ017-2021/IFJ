@@ -310,7 +310,7 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
       }
       if (prec_token->type == T_K_NIL && exp_type != T_K_NIL){
           // Return statement can return type of nill
-          if (where_expression != 3 ){
+          if(where_expression != 3 && where_expression != 2){
               err_call(ERR_RUN_NILL, prec_token);
           }
       }
@@ -570,7 +570,7 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
 
     if (res->type == T_K_NIL && exp_type != T_K_NIL){
         // Return statement can return type of nill
-        if (where_expression != 3 ){
+        if (where_expression != 3 && where_expression != 2){
             err_call(ERR_RUN_NILL, res);
         }
     }
@@ -578,7 +578,7 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
     if (exp_type != T_OTHER){
         if(res->type != exp_type && (res->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
            (res->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
-            // If where = 2 , function(bad types)
+            // If where_expression = 2 , function(bad types)
             if(where_expression == 2){
                 err_call(ERR_SMNTIC_PARAMS_TYPE, res);
             }else{
