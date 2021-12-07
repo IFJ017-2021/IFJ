@@ -4,7 +4,8 @@
  *
  *  @brief Implementation of precedence table
  *
- *  @author <xvasin11> Ladislav Vasina
+ *  @author <xvasin11> Ladislav Vašina
+ *  @author <xhajek06> Vojtěch Hájek
  */
 
 #include "prec_table.h"

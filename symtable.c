@@ -2,7 +2,7 @@
  *  Project: Implementation of imperative language compiler IFJ21
  *  @file symtable.c
  *
- *  @brief // TODO :)
+ *  @brief File that implements symbol table using BST
  *
  *  @author <xpoliv06> Tomáš Polívka
  */
@@ -78,11 +78,6 @@ bool local_bst_search(LocalBSTNodePtr tree, char *key, LocalBSTNodePtr *pointer)
             return local_bst_search(tree->right, key, pointer);
         }
     }
-}
-
-void local_bst_delete(LocalBSTNodePtr *tree, char *key)
-{
-    // TODO
 }
 
 void local_bst_dispose(LocalBSTNodePtr *tree)

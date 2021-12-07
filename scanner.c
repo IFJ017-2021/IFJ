@@ -23,7 +23,6 @@ int get_token_list(DLList *list) {
     new = NULL;
     int error = get_single_token(&new);
     if (error) {
-      // TODO destroy list
       return ERR_LEX;
     }
     if (new->type != T_OTHER &&new->type != T_EOL) {
@@ -169,10 +168,6 @@ int lex_fsm(token_ptr *token) {
   static char current = '\n';
 
   while (fsm_activator) {
-    /*
-    if (col_num == 1)
-      col_num++;
-    */
     nstate = S_NULL;
 
     switch (pstate) {

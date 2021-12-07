@@ -4,7 +4,7 @@
  *
  *  @brief Library that enables working with dynamic strings
  *
- *  @author <xvasin11> Ladislav Vasina
+ *  @author <xvasin11> Ladislav Vašina
  */
 
 #include "str.h"
