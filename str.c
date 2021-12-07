@@ -135,7 +135,7 @@ char *strGetString(string *s){
 
 
 int strGetLength(string *s){
-    return s->length;
+    return (int) strlen(s->data);
 }
 
 
