@@ -101,7 +101,7 @@ bool global_bst_search(GlobalBSTNodePtr tree, char *key, functionPtrData *data);
  *
  * @param tree
  * @param key
- * @param fuction_data
+ * @param function_data
  */
 void global_bst_insert(GlobalBSTNodePtr *tree, char *key, functionPtrData function_data);
 
