@@ -4,7 +4,7 @@
  *
  *  @brief Header file for str.c (Header file that enables working with dynamic strings)
  *
- *  @author <xvasin11> Ladislav Vasina
+ *  @author <xvasin11> Ladislav Vašina
  */
 
 
