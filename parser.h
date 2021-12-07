@@ -45,73 +45,75 @@ void main_next();
  *  4) if expression then STATEMENT STATE_ELSE end STATEMENT <br>
  *  5) return RETURN_LIST STATEMENT <br>
  *  6) while expression do STATEMENT end STATEMENT <br>
- * @param ... ?
  */
 void statement();
 
 /**
  * @brief Implementation of LIST_OF_PARAMS rule. <br>
  * 1) value_id : TYPE_VALUE PARAM_NEXT <br>
- * @param ... ?
+ * @param functionData Function data where input and output parameters are stored
  */
-void list_of_params();
+void list_of_params(functionPtrData functionData);
 
 /**
  * @brief Implementation of PARAM_NEXT rule. <br>
  * 1) , value_id : TYPE_VALUE PARAM_NEXT <br>
- * @param ... ?
+ * @param functionData Function data where input and output parameters are stored
  */
- void param_next();
+ void param_next(functionPtrData functionData);
 
 /**
  * @brief Implementation of ENTRY_LIST_PARAMS rule. <br>
  * 1) ENTRY_PARAM ENTRY_PARAM_NEXT <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
+ * @param tmpData Function data that is used for comparison with functionData
  */
- void entry_list_params();
+ void entry_list_params(functionPtrData functionData, functionPtrData tmpData);
 
 /**
  * @brief Implementation of ENTRY_PARAM rule. <br>
  * 1) expression <br>
  * 2) value_id <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
+ * @param tmpData Function data that is used for comparison with functionData
 */
-void entry_param();
+void entry_param(functionPtrData functionData, functionPtrData tmpData);
 
 /**
  * @brief Implementation of ENTRY_PARAM_NEXT rule. <br>
  * 1) , ENTRY_PARAM ENTRY_PARAM_NEXT <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
+ * @param tmpData Function data that is used for comparison with functionData
 */
-void entry_param_next();
+void entry_param_next(functionPtrData functionData, functionPtrData tmpData);
 
 /**
  * @brief Implementation of LIST_OF_TYPES rule. <br>
  * 1) TYPE_VALUE TYPE_NEXT <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
 */
-void list_of_types();
+void list_of_types(functionPtrData functionData);
 
 /**
  * @brief Implementation of RETURN_LIST_OF_TYPES  rule. <br>
  * 1) : TYPE_VALUE TYPE_NEXT<br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
 */
-void return_list_of_types();
+void return_list_of_types(functionPtrData functionData);
 
 /**
  * @brief Implementation of TYPE_NEXT rule. <br>
  * 1) , TYPE_VALUE TYPE_NEXT <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
 */
-void type_next();
+void type_next(functionPtrData functionData);
 
 /**
  * @brief Implementation of RETURN_TYPE_NEXT rule. <br>
  * 1) , TYPE_VALUE RETURN_TYPE_NEXT <br>
- * @param ... ?
+ * @param functionData Function data that is collected by passing individual rules
 */
-void return_type_next();
+void return_type_next(functionPtrData functionData);
 
 /**
  * @brief Implementation of TYPE_VALUE rule. <br>
@@ -119,7 +121,6 @@ void return_type_next();
  * 2) number <br>
  * 3) integer <br>
  * 4) nill <br>
- * @param ... ?
 */
 void type_value();
 
@@ -127,14 +128,14 @@ void type_value();
  * @brief Implementation of RETURN_LIST rule. <br>
  * 1) function_id(ENTRY_LIST_PARAMS) <br>
  * 2) value_id RETURN_VALUE_NEXT<br>
- * @param ... ?
+ * @param return_values Stack of values to compare count and types of values
 */
 void return_list(Stack_Token *return_values);
 
 /**
  * @brief Implementation of RETURN_LIST rule. <br>
  * 1) , value_id RETURN_VALUE_NEXT <br>
- * @param ... ?
+ * @param return_values Stack of values to compare count and types of values
 */
 void return_value_next(Stack_Token *return_values);
 
@@ -150,28 +151,30 @@ void state_else();
  * 1) expression <br>
  * 2) function_id(ENTRY_LIST_PARAMS) <br>
  * 3) value_id <br>
- * @param ... ?
+ * @param isLocal symptom, zda is lokální
+ * @param stack_of_values Stack of values to compare count and types of values
+ * @param stack_of_ids Stack of ids to find the type value
 */
 void init_value(bool isLocal, Stack_Token *stack_of_values, Stack_Token *stack_of_ids);
 
 /**
  * @brief Implementation of INIT_VALUE_NEXT rule. <br>
  * 1) , INIT_VALUE INIT_VALUE_NEXT <br>
- * @param ... ?
+ * @param stack_of_values Stack of values to compare count and types of values
+ * @param stack_of_ids Stack of ids to find the type value
 */
 void init_value_next(Stack_Token *stack_of_values, Stack_Token *stack_of_ids);
 
 /**
  * @brief Implementation of INIT_LOCAL_VALUE rule. <br>
  * 1) = INIT_VALUE <br>
- * @param ... ?
 */
 void init_local_value();
 
 /**
  * @brief Implementation of VALUE_ID_NEXT rule. <br>
  * 1) , value_id VALUE_ID_NEXT <br>
- * @param ... ?
+ * @param stack_of_ids Stack of ids
 */
 void value_id_next(Stack_Token *stack_of_ids);
 
@@ -183,7 +186,6 @@ void expression_par_tmp(DLList *list);
 
 /**
  * @brief Insert into global frame built-in functions
- * @param list of tokens for expression processing
 */
 void built_in_functions();
 

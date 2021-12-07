@@ -180,11 +180,12 @@ void main_list() {
             CHECK_TYPE(T_ID);
 
             token_ID = token;
-            // Ulozeni nazvu funkce pro konrolu pravilda RETURN_LIST
+
+            // Saves the name of the function to check the RETURN LIST rule
             nameActualFunction = malloc(sizeof(char) * strlen(token->data->string->data));
             strcpy(nameActualFunction, token->data->string->data);
 
-            // Malloc a přiřazení klíče do functionData, následně kontrola zda se již název funkce nachází ve stromě
+            // Malloc and assign the key to functionData, then check if the function name is already in the tree
             bool isDefined = false;
             functionData->key = malloc(sizeof(char) * strlen(token->data->string->data));
             strcpy(functionData->key, token->data->string->data);
@@ -245,7 +246,7 @@ void main_list() {
             GET_TOKEN()
             CHECK_TYPE(T_RIGHT_PAR);
 
-            // Pokud se jedná o funci write, nekontroluje se počet typů
+            // If it is a write function, the count of pamars is not checked
             if (strcmp(token_ID->data->string->data, "write") != 0) {
                 CHECK_COUNT_OF_PARAMS()
             }
@@ -287,7 +288,7 @@ void main_list() {
             GET_TOKEN()
             return_list_of_types(functionData);
 
-            // Vlozeni nove funkce do globalniho vyhledavaciho stromu
+            // Insert a new function into the global search tree
             global_bst_insert(&bst_tree_of_functions, functionData->key, functionData);
 
             GET_TOKEN()
@@ -326,13 +327,13 @@ void statement() {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
+                // If this is a write function, the count of input parameters and individual types are not checked
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
                     for (int i = 0; i < functionData->numOfParams; i++){
                         LocalBSTNodePtr tmpValue;
                         bool isFound = false;
-                        // Pokud je typ expression přeskočí se kontroly
+                        // If the type is expression, checks are skipped
                         if (functionData->paramsType[i] == T_P_EXPRESSION){
                             continue;
                         }
@@ -466,14 +467,17 @@ void statement() {
             GET_TOKEN()
             statement();
 
-            GET_TOKEN();
-            state_else();
-
-            GET_TOKEN()
-            CHECK_TYPE(T_K_END);
-
             Stack_Bst_Pop(&stack_bst_tree);
 
+            local_bst_init(&localFrame);
+            // Push tree (local frame) to stack
+            Stack_Bst_Push(&stack_bst_tree, localFrame);
+
+            GET_TOKEN()
+            state_else();
+            GET_TOKEN()
+            CHECK_TYPE(T_K_END);
+            Stack_Bst_Pop(&stack_bst_tree);
             GET_TOKEN()
             statement();
             break;
@@ -711,13 +715,13 @@ void return_list(Stack_Token *return_values) {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
+                // If this is a write function, the count of input parameters and individual types are not checked
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
                     for (int i = 0; i < functionData->numOfParams; i++){
                         LocalBSTNodePtr tmpValue;
                         bool isFound = false;
-                        // Pokud je typ expression přeskočí se kontroly
+                        // If the type is expression, checks are skipped
                         if (functionData->paramsType[i] == T_P_EXPRESSION){
                             continue;
                         }
@@ -773,7 +777,7 @@ void return_list(Stack_Token *return_values) {
                 }
             }
             GET_TOKEN()
-            // Hledani typu ktery se posle do expression
+            // Search for the type to be sent to expression
             functionPtrData exp_type;
             global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
 
@@ -814,13 +818,13 @@ void return_value_next(Stack_Token *return_values) {
                 GET_TOKEN()
                 CHECK_TYPE(T_RIGHT_PAR);
 
-                // Pokud se jedna o funci write nekotroluje se pocet vstupnich parametru a jednotlivy typy
+                // If this is a write function, the count of input parameters and individual types are not checked
                 if (strcmp(token_ID->data->string->data, "write") != 0) {
                     CHECK_COUNT_OF_PARAMS()
                     for (int i = 0; i < functionData->numOfParams; i++){
                         LocalBSTNodePtr tmpValue;
                         bool isFound = false;
-                        // Pokud je typ expression přeskočí se kontroly
+                        // If the type is expression, checks are skipped
                         if (functionData->paramsType[i] == T_P_EXPRESSION){
                             continue;
                         }
@@ -878,7 +882,7 @@ void return_value_next(Stack_Token *return_values) {
             }
             GET_TOKEN()
 
-            // Hledani typu ktery se posle do expression
+            // Search for the type to be sent to expression
             functionPtrData exp_type;
             global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
 
@@ -928,7 +932,7 @@ void init_value(bool isLocal, Stack_Token *stack_of_values, Stack_Token *stack_o
                 GET_TOKEN()
                 entry_list_params(functionData, tmpData);
 
-                // Pokud se jedna o lokalni promennou musi mit pouze jednu navratovou hodnotu
+                // If it is a local variable, it must have only one return value
                 if(isLocal){
                     if(tmpData->numOfReturns != 1){
                         err_call(ERR_SMNTIC_NUMBER_OF_RETURN_PARAMS, token_ID);
@@ -988,11 +992,11 @@ void init_value(bool isLocal, Stack_Token *stack_of_values, Stack_Token *stack_o
 
             token_ptr prec_token;
 
-            // Pokud se jedna o lokalni deklaraci
+            // If it is a local declaration
             if(isLocal){
                 prec_token = expression(&expression_list, 0, &stack_bst_tree, valueType);
             } else{
-                // Hledani typu v ramcich
+                // Type search in frames
                 LocalBSTNodePtr tmpValue;
                 bool isFound = false;
                 for (int i = stack_bst_tree.topIndex; i >= 0; i--) {
