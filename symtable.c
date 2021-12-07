@@ -80,11 +80,6 @@ bool local_bst_search(LocalBSTNodePtr tree, char *key, LocalBSTNodePtr *pointer)
     }
 }
 
-void local_bst_delete(LocalBSTNodePtr *tree, char *key)
-{
-    // TODO
-}
-
 void local_bst_dispose(LocalBSTNodePtr *tree)
 {
     if(*tree != NULL)
