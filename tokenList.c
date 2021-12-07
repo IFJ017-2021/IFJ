@@ -2,7 +2,7 @@
  *  Project: Implementation of imperative language compiler IFJ21
  *  @file tokenList.c
  *
- *  @brief Implemantation doubly linked list.
+ *  @brief Implementation doubly linked list.
  *
  *  @author <xpoliv06> Tomáš Polívka
  *  @author <xhajek51> Vojtěch Hájek
