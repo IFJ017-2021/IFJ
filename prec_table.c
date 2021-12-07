@@ -567,9 +567,8 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
     if (res->type == T_K_NIL && exp_type != T_K_NIL){
         // Return statement can return type of nill
         if (where_expression != 3 ){
-            err_call(ERR_RUN_NILL, prec_token);
+            err_call(ERR_RUN_NILL, res);
         }
-        err_call(ERR_RUN_NILL, res);
     }
 
     if (exp_type != T_OTHER){
