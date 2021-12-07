@@ -264,8 +264,6 @@ int lex_fsm(token_ptr *token) {
 
     case S_COMMENT3:
       if (current == EOF) {
-        // ungetc(current, stdin);
-        // nstate = S_START;
         nstate = S_ERR;
       } else if (current == ']')
         nstate = S_START;
