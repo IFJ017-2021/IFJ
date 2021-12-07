@@ -87,4 +87,31 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
  * @return
  */
 int number_in_table(token_ptr token_table, int a);
+
+/**
+ * @brief Function that returns which rule will aplly.
+ *
+ * @param symbCount number of symbols in rule.
+ * @param tokens Pointer to table of tokens.
+ * @return
+ */
+prec_parsing_rules check_rule(int symbCount, token_ptr *tokens);
+
+/**
+ * @brief Function that returns string of one part postfix.
+ *
+ * @param string_token Pointer to token.
+ * @return
+ */
+char *string_postfix(token_ptr string_token);
+
+
+/**
+ * @brief Function that returns operation for semantic control of expression.
+ *
+ * @param token_operation Pointer to token.
+ * @return
+ */
+int operation(token_ptr token_operation);
+
 #endif
