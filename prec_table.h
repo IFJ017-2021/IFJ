@@ -4,7 +4,7 @@
  *
  *  @brief Header file for prec_table.c (File that implements precedence table)
  *
- *  @author <xvasin11> Ladislav Vasina
+ *  @author <xvasin11> Ladislav Vašina
  *  @author <xhajek51> Vojtěch Hájek
  */
 #ifndef IFJ_PREC_TABLE_H

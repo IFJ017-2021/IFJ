@@ -4,7 +4,8 @@
  *
  *  @brief Implementation of precedence table
  *
- *  @author <xvasin11> Ladislav Vasina
+ *  @author <xvasin11> Ladislav Vašina
+ *  @author <xhajek06> Vojtěch Hájek
  */
 
 #include "prec_table.h"
@@ -42,7 +43,7 @@ token_ptr prec_token;
 DLList prec_token_list;
 Stack_Bst stack_bst_tree_exp;
 
-int number_in_table(token_ptr token_table, bool a) {
+int number_in_table(token_ptr token_table, int a) {
   if (a == 0) {
     if (token_table->type == T_LT || token_table->type == T_GT ||
         token_table->type == T_LTE || token_table->type == T_GTE ||
@@ -287,7 +288,7 @@ int operation(token_ptr operation){
 }
 
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, token_type exp_type) {
+token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, token_type exp_type) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
     }
