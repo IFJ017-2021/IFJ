@@ -168,10 +168,6 @@ int lex_fsm(token_ptr *token) {
   static char current = '\n';
 
   while (fsm_activator) {
-    /*
-    if (col_num == 1)
-      col_num++;
-    */
     nstate = S_NULL;
 
     switch (pstate) {
