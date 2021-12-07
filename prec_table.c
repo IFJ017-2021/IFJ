@@ -42,7 +42,7 @@ token_ptr prec_token;
 DLList prec_token_list;
 Stack_Bst stack_bst_tree_exp;
 
-int number_in_table(token_ptr token_table, bool a) {
+int number_in_table(token_ptr token_table, int a) {
   if (a == 0) {
     if (token_table->type == T_LT || token_table->type == T_GT ||
         token_table->type == T_LTE || token_table->type == T_GTE ||
@@ -287,7 +287,7 @@ int operation(token_ptr operation){
 }
 
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, token_type exp_type) {
+token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, token_type exp_type) {
   if (list == NULL) {
     err_call(ERR_SYNTAX, NULL);
     }
@@ -307,10 +307,22 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, t
           default:
               break;
       }
+      if (prec_token->type == T_K_NIL && exp_type != T_K_NIL){
+          // Return statement can return type of nill
+          if (where_expression != 3 ){
+              err_call(ERR_RUN_NILL, prec_token);
+          }
+      }
+
       if (exp_type != T_OTHER){
           if(prec_token->type != exp_type && (prec_token->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
              (prec_token->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
-              err_call(ERR_SMNTIC_EXPR, prec_token);
+              // If where = 2 , function(bad types)
+              if(where_expression == 2){
+                  err_call(ERR_SMNTIC_PARAMS_TYPE, prec_token);
+              }else{
+                  err_call(ERR_SMNTIC_EXPR, prec_token);
+              }
           }
       }
       char *tmp = string_postfix(prec_token);
@@ -551,11 +563,23 @@ token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, t
     Stack_Token_Top(sem_stack, &res);
     Stack_Token_Pop(sem_stack);
 
-    if(exp_type != T_OTHER){
+    if (res->type == T_K_NIL && exp_type != T_K_NIL){
+        // Return statement can return type of nill
+        if (where_expression != 3 ){
+            err_call(ERR_RUN_NILL, prec_token);
+        }
+        err_call(ERR_RUN_NILL, res);
+    }
+
+    if (exp_type != T_OTHER){
         if(res->type != exp_type && (res->type != T_K_INTEGER || exp_type != T_K_NUMBER) &&
-           (res->type != T_K_NUMBER || exp_type == T_K_NUMBER))
-        {
-            err_call(ERR_SMNTIC_EXPR, res);
+           (res->type != T_K_NUMBER || exp_type == T_K_NUMBER)){
+            // If where = 2 , function(bad types)
+            if(where_expression == 2){
+                err_call(ERR_SMNTIC_PARAMS_TYPE, res);
+            }else{
+                err_call(ERR_SMNTIC_EXPR, res);
+            }
         }
     }
 

@@ -628,7 +628,7 @@ void entry_param(functionPtrData functionData, functionPtrData tmpData) {
                 DLL_DeleteBefore(&token_list);
             }
         }
-        token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, tmpData->paramsType[functionData->numOfParams]);
+        token_ptr prec_token = expression(&expression_list, 2, &stack_bst_tree, tmpData->paramsType[functionData->numOfParams]);
         DLL_InsertAfter(&token_list, prec_token);
         GET_TOKEN()
     }
@@ -781,7 +781,7 @@ void return_list(Stack_Token *return_values) {
             functionPtrData exp_type;
             global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
 
-            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
+            token_ptr prec_token = expression(&expression_list, 3, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
             DLL_InsertBefore(&token_list, prec_token);
             Stack_Token_Push(return_values, prec_token);
             return_value_next(return_values);
@@ -886,7 +886,7 @@ void return_value_next(Stack_Token *return_values) {
             functionPtrData exp_type;
             global_bst_search(bst_tree_of_functions, nameActualFunction, &exp_type);
 
-            token_ptr prec_token = expression(&expression_list, 0, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
+            token_ptr prec_token = expression(&expression_list, 3, &stack_bst_tree, exp_type->returnsType[return_values->topIndex]);
             DLL_InsertBefore(&token_list, prec_token);
             Stack_Token_Push(return_values, prec_token);
             return_value_next(return_values);

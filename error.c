@@ -43,7 +43,8 @@ void err_call(int error, token_ptr token) {
             fprintf(stderr, "ERR 7 - Semantic error (other)");
             break;
         case ERR_RUN_NILL:
-            fprintf(stderr, "ERR 8 - Runtime error when working with unexpected nil value");
+            fprintf(stderr, "ERR 8 - Runtime error when working with unexpected nil value\n");
+            fprintf(stderr, "Trying to assign nill on line %d, near the colum %d\n", token->line_num, token->col_num);
             break;
         case ERR_RUN_ZERODIV :
             fprintf(stderr, "ERR 9 - Runtime error of integer division by zero constant ");
