@@ -101,10 +101,10 @@ int strCopyConstant(string *s1, char *c){
     return STR_OK;
 }
 
-void asciiConvert(string *s) {
+void asciiConvert(char *s) {
   printf("string@");
-  for (int i = 0; i <= s->length; i++) {
-    int currentAsciiVal = (int)s->data[i];
+  for (int i = 0; i <= (int)strlen(s); i++) {
+    int currentAsciiVal = (int)s[i];
     if (currentAsciiVal < 32 && currentAsciiVal > 0) {
       printf("\\%03d", currentAsciiVal);
     } else if (currentAsciiVal == 35) {
@@ -114,11 +114,10 @@ void asciiConvert(string *s) {
     } else if (currentAsciiVal == 92) {
       printf("\\092");
     } else {
-      printf("%c", s->data[i]);
+      printf("%c", s[i]);
     }
   }
 }
-
 
 int strCompareString(string *s1, string *s2){
     return strcmp(s1->data, s2->data);
