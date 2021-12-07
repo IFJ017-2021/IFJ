@@ -219,9 +219,9 @@ char *string_postfix(token_ptr string_token){
             strAppendStr(b, "'");
             return b->data;
         case T_K_NUMBER:;
-            count = snprintf(NULL, 0, "%i", string_token->data->integer);
+            count = snprintf(NULL, 0, "%f", string_token->data->number);
             a = malloc(sizeof(char) * (count + 1));
-            sprintf(a, "%d", string_token->data->integer);
+            sprintf(a, "%f", string_token->data->number);
             return a;
         case T_K_NIL:
             return "nil";
