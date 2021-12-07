@@ -76,14 +76,6 @@ bool local_bst_search(LocalBSTNodePtr tree, char *key, LocalBSTNodePtr *pointer)
  * @brief
  *
  * @param tree
- * @param key
- */
-void local_bst_delete(LocalBSTNodePtr *tree, char *key);
-
-/**
- * @brief
- *
- * @param tree
  */
 void local_bst_dispose(LocalBSTNodePtr *tree);
 
