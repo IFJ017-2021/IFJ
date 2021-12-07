@@ -68,6 +68,23 @@ typedef enum{
     R_NOTDEFINED    // NONDEFINED RULE
 } prec_parsing_rules;
 
-token_ptr expression(DLList *list, bool where_expression, Stack_Bst *stackBst, token_type exp_type);
-int number_in_table(token_ptr token_table, bool a);
+/**
+ * @brief Function that processes expressions
+ *
+ * @param list List of tokens.
+ * @param where_expression Flag of expression placement.
+ * @param stackBst Stack that we use to store variables.
+ * @param exp_type Type of given the expression.
+ * @return Returns one token of T_K_EXPRESSION type.
+ */
+token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, token_type exp_type);
+
+/**
+ * @brief Function that returns index of given token in prec_table.
+ *
+ * @param token_table Token that we want to find in prec_table.
+ * @param a Flag of expression placement.
+ * @return
+ */
+int number_in_table(token_ptr token_table, int a);
 #endif
