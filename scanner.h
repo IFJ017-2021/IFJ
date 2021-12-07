@@ -106,7 +106,7 @@ int get_token_list(DLList *list);
 /**
  * @brief Read single token from stdin and insert into passed token pointer.
  * 
- * @param insert_into Token pointer into which are data supposed to be insterted. 
+ * @param insert_into Token pointer into which are data supposed to be inserted.
  * @return int State code, If there aren't any errors ? 0 : 2
  */
 int get_single_token(token_ptr *insert_into);
@@ -135,7 +135,7 @@ void print_token_list(DLList *list);
 void print_single_token(token_ptr token);
 
 /**
- * @brief Finiste state machine which decides the type of token.
+ * @brief Finite state machine which decides the type of token.
  * 
  * @param token Token pointer whomst type we need to determine.
  * @return int State code, If there aren't any errors ? 0 : 2 
