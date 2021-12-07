@@ -11,6 +11,7 @@
 #include "scanner.h"
 #include "str.h"
 #include "tokenList.h"
+#include <ctype.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -127,21 +128,24 @@ void generate_code_from_token(token_ptr *token, string *main) {
     }
     break;
 
-  case T_INT:
-    if (func_call && curr_func_write) {
-      printf("WRITE int@%d\n", (*token)->data->integer);
-    }
-    break;
+  case T_P_EXPRESSION:
+    if (curr_func_write) {
+      char *test_str = strGetString((*token)->data->string);
+      int test_double = (*token)->data->number;
+      int test_int = (*token)->data->integer;
 
-  case T_DOUBLE:
-    if (func_call && curr_func_write) {
-      printf("WRITE float@%a\n", (*token)->data->number);
-    }
-    break;
-
-  case T_STRING:
-    if (func_call && curr_func_write) {
-      // printf("WRITE string@%s\n", strForGenerating((*token)->data->string));
+      if (strlen(test_str) == 1 && atoll(test_str) == 0 && test_int == 0 &&
+          test_double == 0.0) {
+        printf("WRITE int@0\n");
+      } else if (test_int != 0 && test_double == 0.0) {
+        printf("WRITE int@%d\n", (*token)->data->integer);
+      } else if (test_int == 0 && test_double != 0.0) {
+        printf("WRITE float@%a\n", (*token)->data->number);
+      } else if (test_int == 0 && test_double == 0) {
+        printf("WRITE ");
+        asciiConvert((*token)->data->string);
+        printf("\n");
+      }
     }
     break;
 
@@ -195,4 +199,41 @@ DEFVAR LF@param1\n\
 MOVE LF@param1 LF@$1\n\
 WRITE LF@param
 CALL $$check_if_int"
+
+    if (func_call && curr_func_write) {
+      int ret = 0;
+      char *str = strGetString((*token)->data->string);
+      for (unsigned long i = 0; str[i] != '\0'; i++) {
+        if (!isdigit(str[i])) {
+          ret = 1;
+        }
+      }
+      if (!ret) {
+        printf("WRITE int@%d\n", (*token)->data->integer);
+        break;
+      }
+      char *ptr;
+      strtod(strGetString((*token)->data->string), &ptr);
+      if (*ptr == '\0') {
+        printf("WRITE float@%a\n", (*token)->data->number);
+        break;
+      }
+      printf("WRITE string@%s\n", strGetString((*token)->data->string));
+      break;
+    }
+
+    if ((currentAsciiVal < 32 && currentAsciiVal > 0) ||
+        currentAsciiVal == 92 || currentAsciiVal == 35) {
+      if (currentAsciiVal == 0) {
+        printf("\\000");
+      } else if (currentAsciiVal < 10) {
+        printf("\\00%d", currentAsciiVal);
+      } else if (currentAsciiVal > 9 && currentAsciiVal < 100) {
+        printf("\\0%d", currentAsciiVal);
+      } else if (currentAsciiVal > 99) {
+        printf("\\%d", currentAsciiVal);
+      }
+    } else {
+      printf("%d", s->data[i]);
+    }
 **/

@@ -12,6 +12,7 @@
  */
 
 #include "error.h"
+#include "generator.h"
 #include "parser.h"
 #include "scanner.h"
 #include <stdio.h>
@@ -34,12 +35,13 @@ int main(int argc, char *argv[]) {
   int lex_return = get_token_list(&token_list);
 
   if (lex_return == 0) {
-    // print_token_list(&token_list);
     // Zavolani syntakticke analyzy
     start(&token_list);
   } else {
     err_call(ERR_LEX, NULL);
   }
+
+  generate_code_from_list(&token_list);
 
   return 0;
 }

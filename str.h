@@ -34,5 +34,6 @@ int strCompareConstant(string *s1, char *s2);
 char *strGetString(string *s);
 int strGetLength(string *s);
 int strGetCapacity(string *s);
+void asciiConvert(string *s);
 
 #endif

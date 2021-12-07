@@ -8,8 +8,9 @@
  */
 
 #include "str.h"
-#include <string.h>
 #include <malloc.h>
+#include <stdio.h>
+#include <string.h>
 
 #define STR_OK 1
 #define STR_ERR 0
@@ -77,9 +78,8 @@ int strAppendStr(string *s1, const char *toAppendStr){
       if (strAppendChar(s1, toAppendStr[i]) == STR_ERR) {
         return STR_ERR;
       }
-
-      return STR_OK;
     }
+    return STR_OK;
 }
 
 /**
@@ -113,6 +113,24 @@ int strCopyConstant(string *s1, char *c){
     strcpy(s1->data, c); // Copy 'c' to 's1'
     s1->length = newLength;
     return STR_OK;
+}
+
+void asciiConvert(string *s) {
+  printf("string@");
+  for (int i = 0; i <= s->length; i++) {
+    int currentAsciiVal = (int)s->data[i];
+    if (currentAsciiVal < 32 && currentAsciiVal > 0) {
+      printf("\\%03d", currentAsciiVal);
+    } else if (currentAsciiVal == 35) {
+      printf("\\035");
+    } else if (currentAsciiVal == 39) {
+      continue;
+    } else if (currentAsciiVal == 92) {
+      printf("\\092");
+    } else {
+      printf("%c", s->data[i]);
+    }
+  }
 }
 
 /**
