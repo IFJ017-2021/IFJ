@@ -28,7 +28,7 @@ void generate_code_from_list(DLList *list) {
   base_code = malloc(sizeof(string));
   strInit(base_code);
   strAppendStr(base_code, ".IFJcode21\nJUMP $$main\n\n");
-  // generate_built_in_code(base_code);
+  generate_built_in_code(base_code);
   printf("%s", strGetString(base_code));
 
   string *main;
@@ -59,10 +59,12 @@ void generate_code_from_token(token_ptr *token, string *main) {
   static int def_retvals = 0;
   static int def_var = 0;
   static int assign = 0;
+  static int reassign = 0;
   static int func_body = 0;
   static int func_call = 0;
   static int to_be_called_func = 0;
   static int main_body_call = 0;
+  static int return_func = 0;
   static char *called_func;
   static char *var_name;
   static char *var_type;
@@ -105,7 +107,14 @@ void generate_code_from_token(token_ptr *token, string *main) {
       printf("DEFVAR TF@%c%s\nMOVE TF@%c%s LF@%c%d\n", '%',
              strGetString((*token)->data->string), '%',
              strGetString((*token)->data->string), '%', curr_param_num);
-    } else if (func_body && !def_var && !func_call) {
+    } else if ((reassign || assign) && (*token)->next->type == T_LEFT_PAR &&
+               !func_call) {
+      return_func = 1;
+      func_call = 1;
+      called_func = strGetString((*token)->data->string);
+      break;
+    } else if (func_body && !def_var && !func_call &&
+               (*token)->next->type != T_ASSIGN) {
       if ((*token)->next->type == T_LEFT_PAR) {
         func_call = 1;
         called_func = strGetString((*token)->data->string);
@@ -124,7 +133,6 @@ void generate_code_from_token(token_ptr *token, string *main) {
       if ((*token)->next->type == T_RIGHT_PAR) {
         to_be_called_func = 0;
         curr_func_param_num = 0;
-        printf("CALL %s\n", called_func);
       }
     } else if (func_body && func_call && to_be_called_func) {
       curr_func_param_num++;
@@ -136,6 +144,9 @@ void generate_code_from_token(token_ptr *token, string *main) {
         curr_func_param_num = 0;
         printf("CREATEFRAME\nCALL %s\n", called_func);
       }
+    } else if (func_body && (*token)->next->type == T_ASSIGN) {
+      var_name = strGetString((*token)->data->string);
+      reassign = 1;
     } else if (!func_body) {
       if ((*token)->next->type == T_LEFT_PAR &&
           !strcmp(strGetString((*token)->data->string), "write")) {
@@ -181,6 +192,12 @@ void generate_code_from_token(token_ptr *token, string *main) {
       func_call = 0;
       if (curr_func_write) {
         curr_func_write = 0;
+      } else if (curr_func_param_num == 0) {
+        printf("CALL %s\n", called_func);
+        if (return_func) {
+          return_func = 0;
+          printf("MOVE TF@%c%s TF@%cfuncret\n", '%', var_name, '%');
+        }
       }
     } else if (main_body_call) {
       main_body_call = 0;
@@ -290,6 +307,10 @@ void generate_code_from_token(token_ptr *token, string *main) {
       buffer +=
           sprintf(buffer, "MOVE TF@%c%s TF@%sexpress\n", '%', var_name, "%%");
       assign = 0;
+    } else if (reassign) {
+      buffer +=
+          sprintf(buffer, "MOVE TF@%c%s TF@%sexpress\n", '%', var_name, "%%");
+      reassign = 0;
     } else if (curr_func_write) {
       buffer += sprintf(buffer, "WRITE TF@%sexpress\n", "%%");
     }
@@ -350,6 +371,7 @@ void generate_code_from_token(token_ptr *token, string *main) {
 
 void generate_built_in_code(string *code) {
   strAppendStr(code, "\
+# PREDEFINED FUNCTIONS START\n\
 LABEL $$check_if_int\n\
 TYPE TF@$type_check_result TF@$type_check\n\
 JUMPIFNEQ $$type_error TF@$type_check_result string@int\n\
@@ -358,35 +380,28 @@ RETURN\n\
 LABEL $$type_error\n\
 WRITE string@\\010\\032Incompatible\\032type\\032error.\n\
 EXIT int@4\n\
+\n\
+LABEL readi\n\
+PUSHFRAME\n\
+DEFVAR LF@%funcret\n\
+READ LF@%funcret int\n\
+POPFRAME\n\
+RETURN\n\
+\n\
+LABEL readn\n\
+PUSHFRAME\n\
+DEFVAR LF@%funcret\n\
+READ LF@%funcret float\n\
+POPFRAME\n\
+RETURN\n\
+\n\
+LABEL reads\n\
+PUSHFRAME\n\
+DEFVAR LF@%funcret\n\
+READ LF@%funcret string\n\
+POPFRAME\n\
+RETURN\n\
+\n\
+# PREDEFINED FUNCTIONE END\n\
 \n");
 }
-
-/**
-LABEL write\n\
-PUSHFRAME\n\
-DEFVAR LF@param1\n\
-MOVE LF@param1 LF@$1\n\
-WRITE LF@param
-CALL $$check_if_int"
-
-    if (curr_func_write) {
-      char *test_str = strGetString((*token)->data->string);
-      int test_double = (*token)->data->number;
-      int test_int = (*token)->data->integer;
-
-      if (strlen(test_str) == 1 && atoll(test_str) == 0 && test_int == 0 &&
-          test_double == 0.0) {
-        printf("WRITE int@0\n");
-      } else if (test_int != 0 && test_double == 0.0) {
-        printf("WRITE int@%d\n", (*token)->data->integer);
-      } else if (test_int == 0 && test_double != 0.0) {
-        printf("WRITE float@%a\n", (*token)->data->number);
-      } else if (test_int == 0 && test_double == 0) {
-        printf("WRITE ");
-        asciiConvert((*token)->data->string);
-        printf("\n");
-      }
-    } else if (def_var) {
-      def_var = 0;
-    }
-**/

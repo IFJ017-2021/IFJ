@@ -18,17 +18,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int main(int argc, char *argv[]) {
-  FILE *f;
-  if (argc == 1) {
-    fprintf(stderr, "Missing a file argument.\n");
-    return ERR_INTERNAL;
-  }
-  if ((f = freopen(argv[1], "r", stdin)) == NULL) {
-    fprintf(stderr, "File can't be opened.\n");
-    return ERR_INTERNAL;
-  }
-
+int main() {
   DLList token_list;
   DLL_Init(&token_list);
 
