@@ -12,6 +12,8 @@
 #include "error.h"
 #include "parser.h"
 #include "stack.h"
+#include "str.h"
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
@@ -212,17 +214,27 @@ char *string_postfix(token_ptr string_token){
             sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_K_STRING:;
-            char *pointer = malloc(sizeof (char) * strlen(string_token->data->string->data));
-            strcpy(pointer, string_token->data->string->data);
-            strClear(string_token->data->string);
-            for (int i = 0; i <= (int)strlen(pointer); i++) {
-                int currentAsciiVal = (int)pointer[i];
-                if (currentAsciiVal == 32) {
-                    strAppendStr(string_token->data->string, "\\032");
-                } else{
-                    strAppendChar(string_token->data->string, pointer[i]);
-                }
+          char *pointer =
+              malloc(sizeof(char) * strlen(string_token->data->string->data));
+          strcpy(pointer, string_token->data->string->data);
+          strClear(string_token->data->string);
+          char esc[5];
+          for (int i = 0; i <= (int)strlen(pointer); i++) {
+            int currentAsciiVal = (int)pointer[i];
+            if (currentAsciiVal <= 32 && currentAsciiVal > 0) {
+              sprintf(esc, "\\%03d", currentAsciiVal);
+              strAppendStr(string_token->data->string, esc);
+            } else if (currentAsciiVal == 35) {
+              sprintf(esc, "\\%03d", 35);
+              strAppendStr(string_token->data->string, esc);
+            } else if (currentAsciiVal == 92) {
+              sprintf(esc, "\\%03d", 92);
+              strAppendStr(string_token->data->string, esc);
+            } else {
+              strAppendChar(string_token->data->string, pointer[i]);
             }
+          }
+
             string *b = malloc(sizeof(string));
             strInit(b);
             strAppendStr(b, "'");
@@ -639,7 +651,7 @@ token_ptr expression(DLList *list, int where_expression, Stack_Bst *stackBst, to
     while (i < count){
         char *tmp = string_postfix(expression_table[i]);
         if(i != 0){
-            strAppendStr(s, " ");
+          strAppendStr(s, " ");
         }
         strAppendStr(s, tmp);
         expression_table[i] = NULL;
