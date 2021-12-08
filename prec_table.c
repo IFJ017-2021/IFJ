@@ -212,7 +212,8 @@ char *string_postfix(token_ptr string_token){
             sprintf(a, "%d", string_token->data->integer);
             return a;
         case T_K_STRING:;
-            char *pointer = strGetString(string_token->data->string);
+            char *pointer = malloc(sizeof (char) * strlen(string_token->data->string->data));
+            strcpy(pointer, string_token->data->string->data);
             strClear(string_token->data->string);
             for (int i = 0; i <= (int)strlen(pointer); i++) {
                 int currentAsciiVal = (int)pointer[i];
